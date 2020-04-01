@@ -1,0 +1,77 @@
+{
+  "project_info": {
+    "project_number": "762134331735",
+    "firebase_url": "https://okuplus-7b4fb.firebaseio.com",
+    "project_id": "okuplus-7b4fb",
+    "storage_bucket": "okuplus-7b4fb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:762134331735:android:76fdfd3ba27eedea6c3e12",
+        "android_client_info": {
+          "package_name": "com.example.flutterapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "762134331735-gk4djoqolpr356el92b262svkhv2nr7e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutterapp",
+            "certificate_hash": "acbdd84659f7184221c5c68a378b05c9e8f45ee8"
+          }
+        },
+        {
+          "client_id": "762134331735-uuu3s2moflh8iga936pfuaelq5o1qrrb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgaW03mIyGA1Hrut5Wf-vcC8kB1tplfCM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "762134331735-uuu3s2moflh8iga936pfuaelq5o1qrrb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:762134331735:android:8a4934e152922dc96c3e12",
+        "android_client_info": {
+          "package_name": "oku.plus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "762134331735-uuu3s2moflh8iga936pfuaelq5o1qrrb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgaW03mIyGA1Hrut5Wf-vcC8kB1tplfCM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "762134331735-uuu3s2moflh8iga936pfuaelq5o1qrrb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
