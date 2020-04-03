@@ -19,7 +19,7 @@ class MainDrawer extends StatefulWidget {
 }
 class _MainDrawerState extends State<MainDrawer>{
 
-  User currentUser = new User("sss", "qwdqw", "", "www", "", "", "");
+  User currentUser = new User("sss", "qwdqw", "", "www", "", "");
   AuthService authService = new AuthService();
 
   @override

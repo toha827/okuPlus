@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/shared/constants.dart';
 import 'package:flutterapp/shared/loading.dart';
@@ -19,6 +21,7 @@ class _RegisterState extends State<Register> {
   bool loading = false;
 
   // text field state
+  String fullName = '';
   String email = '';
   String password = '';
   String error = '';
@@ -58,25 +61,41 @@ class _RegisterState extends State<Register> {
             key: _formKey,
             child: Column(
               children: <Widget>[
-                SizedBox(height: 20.0),
+                SizedBox(height: 10.0),
                 TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Email Address'),
+                  decoration: const InputDecoration(
+                      icon: const Icon(Icons.person),
+                      hintText: 'Fullname'),
+                  validator: (val) => val.isEmpty ? 'Enter Full Name' : null,
+                  onChanged: (val) {
+                    setState(() => fullName = val.trim());
+                  },
+                ),
+                SizedBox(height: 10.0),
+                TextFormField(
+                  decoration: const InputDecoration(
+                      icon: const Icon(Icons.email),
+                      hintText: 'Email Address'),
                   validator: (val) => val.isEmpty ? 'Enter an Email' : null,
                   onChanged: (val) {
-                    setState(() => email = val);
+                    setState(() => email = val.trim());
                   },
                 ),
-                SizedBox(height: 20.0,),
+                SizedBox(height: 10.0,),
                 TextFormField(
                   obscureText: true,
-                  decoration: textInputDecoration.copyWith(hintText: 'Password'),
+                  decoration: const InputDecoration(
+                      icon: Icon(Icons.vpn_key),
+                      hintText: 'Password'),
                   validator: (val) => val.length < 6 ? 'Enter an Password with length of 6 characters' : null,
                   onChanged: (val) {
-                    setState(() => password = val);
+                    setState(() => password = val.trim());
                   },
                 ),
-                SizedBox(height: 20.0,),
+                SizedBox(height: 10.0,),
                 DropdownButton(
+                  icon: Icon(Icons.accessibility),
+                  isExpanded: true,
                   value: _currentUserType,
                   items: _dropDownMenuItems,
                   onChanged: changedDropDownItem,
@@ -85,20 +104,11 @@ class _RegisterState extends State<Register> {
                 RaisedButton(
                   color: Colors.blue[400],
                   child: Text(
-                    'Sign in',
+                    'Register',
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () async {
-                    if (_formKey.currentState.validate()) {
-                      setState(() => loading = true );
-                      dynamic result = await _auth.registerWithEmailAndPassword(email.trim(), password.trim(), _currentUserType.trim());
-                      if (result == null) {
-                        setState(() => {
-                          error = 'Please supply a valid email',
-                          loading = false
-                        });
-                      }
-                    }
+                    register();
                   },
                 ),
                 SizedBox(height: 12.0),
@@ -111,6 +121,20 @@ class _RegisterState extends State<Register> {
           )
       ),
     );
+  }
+
+  Future<void> register() async {
+    if (_formKey.currentState.validate()) {
+      setState(() => loading = true );
+      User newUser = new User(null, fullName, email, fullName, "", _currentUserType);
+      dynamic result = await _auth.registerWithEmailAndPassword(newUser, password);
+      if (result == null) {
+        setState(() => {
+          error = 'Please supply a valid email',
+          loading = false
+        });
+      }
+    }
   }
 
   // here we are creating the list needed for the DropDownButton
