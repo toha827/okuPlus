@@ -3,8 +3,8 @@ class Course {
   String name;
   String image;
   String description;
-
-  Course({this.id, this.name, this.image, this.description});
+  String tag;
+  Course({this.id, this.name, this.image, this.description, this.tag});
 
   Map<String,dynamic> toMap(){
     var map = new Map<String,dynamic>();
@@ -12,6 +12,7 @@ class Course {
     map['name'] = name;
     map['image'] = image;
     map['description'] = description;
+    map['tag'] = tag;
     return map;
   }
   Course.fromMap(Map<String,dynamic> map){
@@ -19,5 +20,6 @@ class Course {
     this.name = map['name'];
     this.image = map['image'] ?? '';
     this.description = map['description'] ?? '';
+    this.tag = map['tag'];
   }
 }
