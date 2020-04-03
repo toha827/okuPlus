@@ -36,7 +36,7 @@ class DatabaseService {
         tag: doc.data['tag'] ?? ''
       );
     }).toList();
-  }
+  } 
 
   Stream<List<Course>> get courses {
     return coursesCollection.snapshots()

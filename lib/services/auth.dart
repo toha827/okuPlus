@@ -38,7 +38,7 @@ class AuthService {
 
   // create user obj based on FirebaseUser
   User _userFromFirebaeUser(FirebaseUser user) {
-    return user != null ? User(user.uid,'','',user.email, user.displayName, "","") : null;
+    return user != null ? User(user.uid,'',user.email, user.displayName, "","") : null;
   }
 
   // auth change user stream
@@ -88,7 +88,7 @@ class AuthService {
     final AuthResult authResult = await _auth.signInWithCredential(credential);
     final FirebaseUser user = authResult.user;
 
-    updateUserData(user, "Teacher");
+//    updateUserData(user, "Teacher");
 
 //    assert(!user.isAnonymous);
 //    assert(await user.getIdToken() != null);
@@ -101,13 +101,13 @@ class AuthService {
   }
 
   // register with email & password
-  Future registerWithEmailAndPassword( String email, String password, String userType ) async {
+  Future registerWithEmailAndPassword( User newUser, String password ) async {
     try {
-      AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      AuthResult result = await _auth.createUserWithEmailAndPassword(email: newUser.email, password: password);
       FirebaseUser user = result.user;
       await user.sendEmailVerification();
-
-      updateUserData(user, userType);
+      newUser.uid = user.uid;
+      updateUserData(newUser);
 
       return _userFromFirebaeUser(user);
     } catch(e) {
@@ -126,13 +126,13 @@ class AuthService {
     }
   }
 
-  Future<void> updateUserData(FirebaseUser user, String userType) async {
+  Future<void> updateUserData(User user) async {
     return await _db.collection('users').document(user.uid).setData({
       'uid': user.uid,
       'email': user.email,
-      'userType': userType,
+      'userType': user.userType,
       'displayName': user.displayName,
-      'photoURL': user.photoUrl
+      'photoURL': user.photoURL
     });
   }
 }
