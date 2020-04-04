@@ -38,7 +38,7 @@ class AuthService {
 
   // create user obj based on FirebaseUser
   User _userFromFirebaeUser(FirebaseUser user) {
-    return user != null ? User(user.uid,'',user.email, user.displayName, "","") : null;
+    return user != null ? User(uid: user.uid, email: user.email, displayName: user.displayName, photoURL: "") : null;
   }
 
   // auth change user stream
@@ -86,15 +86,15 @@ class AuthService {
     );
 
     final AuthResult authResult = await _auth.signInWithCredential(credential);
+
     final FirebaseUser user = authResult.user;
+    User newUser = new User(uid: user.uid, fullName: user.displayName, email:user.email, displayName: user.displayName, birthDate: null, photoURL: user.photoUrl, userState: "Teacher");
+    updateUserData(user.uid, newUser);
 
-//    updateUserData(user, "Teacher");
-
-//    assert(!user.isAnonymous);
-//    assert(await user.getIdToken() != null);
+    assert(!user.isAnonymous);
+    assert(await user.getIdToken() != null);
 
     final FirebaseUser currentUser = await _auth.currentUser();
-//    assert(user.uid == currentUser.uid);
 
     return user;
 
@@ -106,8 +106,8 @@ class AuthService {
       AuthResult result = await _auth.createUserWithEmailAndPassword(email: newUser.email, password: password);
       FirebaseUser user = result.user;
       await user.sendEmailVerification();
-      newUser.uid = user.uid;
-      updateUserData(newUser);
+
+      updateUserData(user.uid, newUser);
 
       return _userFromFirebaeUser(user);
     } catch(e) {
@@ -126,13 +126,10 @@ class AuthService {
     }
   }
 
-  Future<void> updateUserData(User user) async {
-    return await _db.collection('users').document(user.uid).setData({
-      'uid': user.uid,
-      'email': user.email,
-      'userType': user.userType,
-      'displayName': user.displayName,
-      'photoURL': user.photoURL
-    });
+  Future<void> updateUserData(String uid, User user) async {
+    user.uid = uid;
+    return await _db.collection('users').document(uid).setData(
+      user.toMap()
+    );
   }
 }
