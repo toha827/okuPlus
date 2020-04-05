@@ -79,10 +79,15 @@ class _ProfileState extends State<Profile>{
                                 child: new Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    new Icon(
+                                    GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      },
+                                        child:new Icon(
                                       Icons.arrow_back_ios,
                                       color: Colors.black,
                                       size: 22.0,
+                                        )
                                     ),
                                     Padding(
                                       padding: EdgeInsets.only(left: 25.0),

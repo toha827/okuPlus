@@ -37,6 +37,7 @@ class _SettingsState extends State<Settings> {
                   onPressed: () async {
                     await _authService.signOut();
                     Navigator.push(context, MaterialPageRoute(builder: (context) => Wrapper()));
+
                   }
               )
             ],
