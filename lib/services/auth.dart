@@ -1,6 +1,9 @@
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/services/database.dart';
 import 'package:flutterapp/services/users.dart';
@@ -8,6 +11,7 @@ import 'package:flutterapp/shared/constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as Path;
 
 class AuthService {
 
@@ -89,15 +93,16 @@ class AuthService {
 
     final FirebaseUser user = authResult.user;
     User newUser = new User(uid: user.uid, fullName: user.displayName, email:user.email, displayName: user.displayName, birthDate: null, photoURL: user.photoUrl, userState: "Teacher");
-    updateUserData(user.uid, newUser);
-
-    assert(!user.isAnonymous);
-    assert(await user.getIdToken() != null);
+    bool isNew = false;
+    await userEmailExist(user.uid)
+        .listen((value) => isNew = value.uid != '' ? true : false );
+    if (isNew) {
+      updateUserData(user.uid, newUser);
+    }
 
     final FirebaseUser currentUser = await _auth.currentUser();
 
     return user;
-
   }
 
   // register with email & password
@@ -126,10 +131,30 @@ class AuthService {
     }
   }
 
+  Stream<User> userEmailExist(String uid) {
+    return _db.collection('users')
+        .document(uid).snapshots()
+        .map((event) =>
+          User.fromMap(event.data));
+  }
+
   Future<void> updateUserData(String uid, User user) async {
     user.uid = uid;
     return await _db.collection('users').document(uid).setData(
       user.toMap()
     );
   }
+
+  Future<StorageReference> uploadFile(File _image) async {
+    StorageReference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('profileImages/${Path.basename(_image.path)}}');
+    StorageUploadTask uploadTask = storageReference.putFile(_image);
+    await uploadTask.onComplete;
+    print('File Uploaded');
+    String url;
+    return storageReference;
+  }
+
+
 }

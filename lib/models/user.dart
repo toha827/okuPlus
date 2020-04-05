@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class User {
 
   String uid;
@@ -50,7 +52,11 @@ class User {
     this.fullName = map['fullName'] ?? '';
     this.displayName = map['displayName'] ?? '';
     this.photoURL = map['photoURL'] ?? '';
+    this.birthDate = DateTime.fromMillisecondsSinceEpoch(map['birthDate'].seconds * 1000) ?? new DateTime.now();
     this.userType = map['userType'] ?? '';
+    this.userState = map['userState'] ?? '';
+    this.userPurpose = map['userPurpose'] ?? '';
+    this.userInterest = map['userInterest'] ?? '';
   }
 
   Map<String,dynamic> toMap(){
