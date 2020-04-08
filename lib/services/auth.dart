@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/services/database.dart';
 import 'package:flutterapp/services/users.dart';
@@ -79,6 +80,35 @@ class AuthService {
     }
   }
 
+  // FacebbookSignIn
+  Future<FirebaseUser> facebookSignIn() async {
+    final FacebookLogin facebookSignIn = new FacebookLogin();
+    final FacebookLoginResult facebookLoginResult = await facebookSignIn.logIn(['email', 'public_profile']);
+
+
+    if (facebookLoginResult.status == FacebookLoginStatus.loggedIn) {
+      FacebookAccessToken facebookAccessToken = facebookLoginResult.accessToken;
+      AuthCredential authCredential = FacebookAuthProvider.getCredential(
+          accessToken: facebookAccessToken.token);
+      FirebaseUser user;
+      user = (await _auth.signInWithCredential(authCredential)).user;
+      User newUser = new User(uid: user.uid,
+          fullName: user.displayName,
+          email: user.email ?? "",
+          displayName: user.displayName,
+          birthDate: null,
+          photoURL: user.photoUrl,
+          userState: "Teacher");
+      bool isNew = false;
+      await userEmailExist(user.uid)
+          .listen((value) => isNew = value.uid != '' ? true : false);
+
+        updateUserData(user.uid, newUser);
+      return user;
+    } else {
+      return null;
+    }
+  }
   // googleSign In
   Future<FirebaseUser> googleSignIn() async {
     GoogleSignInAccount googleUser = await _googleSignIn.signIn();

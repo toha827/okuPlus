@@ -52,7 +52,7 @@ class User {
     this.fullName = map['fullName'] ?? '';
     this.displayName = map['displayName'] ?? '';
     this.photoURL = map['photoURL'] ?? '';
-    this.birthDate = DateTime.fromMillisecondsSinceEpoch(map['birthDate'].seconds * 1000) ?? new DateTime.now();
+    this.birthDate = DateTime.fromMillisecondsSinceEpoch(map['birthDate'] == null ? new DateTime.now().millisecondsSinceEpoch : map['birthDate'].seconds * 1000);
     this.userType = map['userType'] ?? '';
     this.userState = map['userState'] ?? '';
     this.userPurpose = map['userPurpose'] ?? '';

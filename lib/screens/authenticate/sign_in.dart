@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterapp/screens/home/profile.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/shared/button.dart';
 import 'package:flutterapp/shared/constants.dart';
@@ -100,6 +101,27 @@ class _SignInState extends State<SignIn> {
                       error = 'Could not sign in with those credentials',
                       loading = false
                     });
+                  }
+                  else {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
+                  }
+                },
+                color: Colors.white,
+              ),
+              MaterialButton(
+                child: button('Facebook', 'assets/facebook.png'),
+                onPressed: (){
+                  setState(() => loading = true);
+                  dynamic result = _auth.facebookSignIn();
+                  print("GOOGLE " + result);
+                  if (result == null) {
+                    setState(() => {
+                      error = 'Could not sign in with those credentials',
+                      loading = false
+                    });
+                  }
+                  else {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
                   }
                 },
                 color: Colors.white,
