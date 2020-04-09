@@ -5,8 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/services/database.dart';
+import 'package:flutterapp/services/teacher_service.dart';
 import 'package:flutterapp/services/users.dart';
 import 'package:flutterapp/shared/constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -20,6 +22,7 @@ class AuthService {
   final Api _usersApi = new Api('users');
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Firestore _db = Firestore.instance;
+  TeacherService teacherService;
   Observable<Map<String, dynamic>> profile;
   Observable<FirebaseUser> CurrentUser;
   BehaviorSubject<bool> isTeacher;
@@ -98,12 +101,12 @@ class AuthService {
           displayName: user.displayName,
           birthDate: null,
           photoURL: user.photoUrl,
-          userState: "Teacher");
+          userType: "Teacher");
       bool isNew = false;
-      await userEmailExist(user.uid)
-          .listen((value) => isNew = value.uid != '' ? true : false);
-
+      dynamic result = await userEmailExist(user.uid);
+      if (!result) {
         updateUserData(user.uid, newUser);
+      }
       return user;
     } else {
       return null;
@@ -122,11 +125,10 @@ class AuthService {
     final AuthResult authResult = await _auth.signInWithCredential(credential);
 
     final FirebaseUser user = authResult.user;
-    User newUser = new User(uid: user.uid, fullName: user.displayName, email:user.email, displayName: user.displayName, birthDate: null, photoURL: user.photoUrl, userState: "Teacher");
+    User newUser = new User(uid: user.uid, fullName: user.displayName, email:user.email, displayName: user.displayName, birthDate: null, photoURL: user.photoUrl, userType: "Teacher");
     bool isNew = false;
-    await userEmailExist(user.uid)
-        .listen((value) => isNew = value.uid != '' ? true : false );
-    if (isNew) {
+    dynamic result = await userEmailExist(user.uid);
+    if (!result) {
       updateUserData(user.uid, newUser);
     }
 
@@ -161,15 +163,23 @@ class AuthService {
     }
   }
 
-  Stream<User> userEmailExist(String uid) {
-    return _db.collection('users')
-        .document(uid).snapshots()
-        .map((event) =>
-          User.fromMap(event.data));
+  Future userEmailExist(String uid) async {
+    final snapShot = await Firestore.instance.collection('users').document(uid).get();
+
+    if (snapShot.exists){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 
   Future<void> updateUserData(String uid, User user) async {
     user.uid = uid;
+    if (user.userType == "Teacher") {
+      teacherService = new TeacherService(uid: uid);
+      dynamic result = await teacherService.updateTeacher(Teacher(uid: uid));
+    }
     return await _db.collection('users').document(uid).setData(
       user.toMap()
     );

@@ -1,6 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterapp/models/Teacher.dart';
+import 'package:flutterapp/models/TeacherCourse.dart';
 import 'package:flutterapp/models/course.dart';
+import 'package:flutterapp/models/user.dart';
+import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/database.dart';
+import 'package:flutterapp/services/teacher_service.dart';
 import 'package:flutterapp/shared/constants.dart';
 import 'package:flutterapp/shared/loading.dart';
 
@@ -13,8 +20,11 @@ class _AddCourseState extends State<AddCourse> {
 
   final _formKey = GlobalKey<FormState>();
 
-
+  final AuthService _auth = AuthService();
   final DatabaseService _dbService = DatabaseService();
+  TeacherService teacherService;
+  Teacher teacher;
+  User CurrentUser;
 
   String name = '';
   String image = '';
@@ -26,7 +36,19 @@ class _AddCourseState extends State<AddCourse> {
 
   @override
   void initState() {
-
+    _auth.profile
+        .listen((event) {
+          setState(() {
+            CurrentUser = User.fromMap(event);
+            teacherService = new TeacherService(uid: CurrentUser.uid);
+            teacherService.getTeacher()
+                .listen((event) {
+              setState(() {
+                teacher = event;
+              });
+            });
+          });
+        });
     _dbService.courses.listen((event) {
       count = event.length;
     });
@@ -79,6 +101,9 @@ class _AddCourseState extends State<AddCourse> {
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
                       setState(() => loading = true);
+
+                      teacher.teacherCourses.add(TeacherCourse(courseId: count,students: []));
+                      dynamic res = teacherService.updateTeacher(teacher);
                       dynamic result = await _dbService.addPost(Course.fromMap({'id': count, 'name': name, 'image': '', 'description': description}));
                       if (result == null) {
                         setState(() => {
