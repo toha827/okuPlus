@@ -43,10 +43,10 @@ class _AddCourseState extends State<AddCourse> {
             teacherService = new TeacherService(uid: CurrentUser.uid);
             teacherService.getTeacher()
                 .listen((event) {
-              setState(() {
-                teacher = event;
-              });
-            });
+                  setState(() {
+                    teacher = event;
+                  });
+                });
           });
         });
     _dbService.courses.listen((event) {
@@ -104,14 +104,14 @@ class _AddCourseState extends State<AddCourse> {
 
                       teacher.teacherCourses.add(TeacherCourse(courseId: count,students: []));
                       dynamic res = teacherService.updateTeacher(teacher);
-                      dynamic result = await _dbService.addPost(Course.fromMap({'id': count, 'name': name, 'image': '', 'description': description}));
+                      dynamic result = await _dbService.addPost(Course.fromMap({'id': count, 'name': name, 'image': '', 'teacherId': teacher.uid, 'description': description}));
                       if (result == null) {
                         setState(() => {
                           error = 'Could not sing in with those credentials',
                           loading = false
                         });
                       }
-                      Navigator.pop(context, 'Yep!');
+                      Navigator.pop(context);
                     }
                   },
                 ),

@@ -36,7 +36,7 @@ class MyCoursesView extends StatelessWidget {
                       label: Text('logout'),
                       onPressed: () async {
                         await _auth.signOut();
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Wrapper()));
+                        Navigator.pop(context);
                       }
                   )
                 ],

@@ -30,14 +30,7 @@ class Home extends StatelessWidget {
             backgroundColor: Colors.blue[400],
             elevation: 0.0,
             actions: <Widget>[
-              FlatButton.icon(
-                  icon: Icon(Icons.person),
-                  label: Text('logout'),
-                  onPressed: () async {
-                     await _auth.signOut();
-                   //  Navigator.push(context, MaterialPageRoute(builder: (context) => Wrapper()));
-                  }
-              )
+              
             ],
           ),
           drawer: MainDrawer(),
@@ -50,13 +43,13 @@ class Home extends StatelessWidget {
           backgroundColor: Colors.white,
           floating: false,
           pinned: true,
-          expandedHeight: 200.0,
+          expandedHeight: 50.0,
 
           ///Properties of the App Bar when it is expanded
           flexibleSpace: FlexibleSpaceBar(
             centerTitle: true,
             title: Text(
-              "SliverGrid Widget",
+              "Courses",
               style: TextStyle(
                   color: Colors.black87,
                   fontSize: 20.0,

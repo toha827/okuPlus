@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/home/home.dart';
 import 'package:flutterapp/screens/home/homepage.dart';
+import 'package:flutterapp/screens/home/my_statistics.dart';
 import 'package:flutterapp/screens/home/profile.dart';
 import 'package:flutterapp/screens/home/settings.dart';
 import 'package:flutterapp/screens/home/myCourses.dart';
 import 'package:flutterapp/screens/teacher/my_teacher_courses.dart';
+import 'package:flutterapp/screens/wrapper.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/shared/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -94,6 +96,18 @@ class _MainDrawerState extends State<MainDrawer>{
               },
             ),
             ListTile(
+              leading: Icon(Icons.settings),
+              title: Text(
+                'Home',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.person),
               title: Text(
                 'Courses',
@@ -119,6 +133,21 @@ class _MainDrawerState extends State<MainDrawer>{
                     Navigator.push(context, MaterialPageRoute(builder: (context) => MyCoursesView()));
                   },
                 ),
+            ),
+            new Visibility(
+              visible: currentUser.userType == 'Teacher' || currentUser.userType == 'Admin',
+              child: ListTile(
+                leading: Icon(Icons.settings),
+                title: Text(
+                  'My Statistics',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => MyStatistics()));
+                },
+              ),
             ),
             new Visibility(
               visible: currentUser.userType == 'Teacher',
@@ -148,18 +177,6 @@ class _MainDrawerState extends State<MainDrawer>{
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text(
-                'Home',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
-              },
-            ),
-            ListTile(
               leading: Icon(Icons.arrow_back),
               title: Text(
                 'Logout',
@@ -168,6 +185,7 @@ class _MainDrawerState extends State<MainDrawer>{
                 ),
               ),
               onTap: () async {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Wrapper()));
                 await authService.signOut();
               },
             )

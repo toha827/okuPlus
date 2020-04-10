@@ -2,12 +2,16 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterapp/models/Teacher.dart';
+import 'package:flutterapp/models/TeacherCourse.dart';
 import 'package:flutterapp/models/course.dart';
 import 'package:flutterapp/models/myCourse.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/myCourses.dart';
+import 'package:flutterapp/services/teacher_service.dart';
 import 'package:flutterapp/shared/cardDetatil.dart';
 import 'package:flutterapp/shared/common.dart';
+import 'package:flutterapp/shared/loading.dart';
 import 'package:flutterapp/shared/textStyle.dart';
 
 class CourseDetail extends StatefulWidget {
@@ -23,17 +27,24 @@ class _CourseDetailState extends State<CourseDetail> {
   Course course;
   String uid;
   MyCoursesService _myCoursesService;
+  TeacherService _teacherService;
+  Teacher _teacher;
   bool isBought = false;
-  List<Course> list;
+  List<Course> list = [];
   _CourseDetailState(this.course, this.uid);
-
+  bool isLoading = true;
   final AuthService _auth = AuthService();
   @override
   void initState() {
-      _myCoursesService = MyCoursesService(uid);
-      _myCoursesService.courses.listen((event) {
-        list = event ?? new List<Course>();
-        event.forEach((element) {
+    _auth.CurrentUser.listen((event) {
+      setState(() {
+        uid = event.uid;
+        _myCoursesService = MyCoursesService(event.uid);
+        _teacherService = TeacherService(uid: course.teacherId);
+      });
+      _myCoursesService.courses.listen((el) {
+        list = el ?? new List<Course>();
+        el.forEach((element) {
           if(element.id == course.id) {
             setState(() {
               isBought = true;
@@ -41,13 +52,20 @@ class _CourseDetailState extends State<CourseDetail> {
           }
         });
       });
+      _teacherService.getTeacher().listen((el) {
+        setState(() {
+          _teacher = el;
+          isLoading = false;
+        });
+      });
+    });
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return isLoading ? new Loading() : new Scaffold(
               body: new Container(
             constraints: new BoxConstraints.expand(),
             color: new Color(0xFF736AB7),
@@ -128,6 +146,12 @@ class _CourseDetailState extends State<CourseDetail> {
                           ),
                           onPressed: () {
                             list.add(course);
+                            _teacher.teacherCourses.forEach((element) {
+                              if( element.courseId == course.id) {
+                                element.students.add(uid);
+                              }
+                            });
+                            _teacherService.updateTeacher(_teacher);
                             _myCoursesService.updateUserData(MyCourse(myCourses: list));
                           }
                       )

@@ -101,13 +101,13 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: Colors.white,
               floating: false,
               pinned: true,
-              expandedHeight: 200.0,
+              expandedHeight: 50.0,
 
               ///Properties of the App Bar when it is expanded
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
                 title: Text(
-                  "SliverGrid Widget",
+                  "Homepage",
                   style: TextStyle(
                     color: Colors.black87,
                     fontSize: 20.0,

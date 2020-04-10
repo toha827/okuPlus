@@ -28,13 +28,7 @@ class DatabaseService {
 
   List<Course> _coursesListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc){
-      return Course(
-        id: doc.data['id'],
-        name: doc.data['name'] ?? '',
-        description: doc.data['description'] ?? '',
-        image: doc.data['image'] ?? '',
-        tag: doc.data['tag'] ?? ''
-      );
+      return Course.fromMap(doc.data);
     }).toList();
   } 
 
