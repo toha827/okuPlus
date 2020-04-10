@@ -3,9 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/home/home.dart';
+import 'package:flutterapp/screens/home/homepage.dart';
 import 'package:flutterapp/screens/home/profile.dart';
 import 'package:flutterapp/screens/home/settings.dart';
 import 'package:flutterapp/screens/home/myCourses.dart';
+import 'package:flutterapp/screens/teacher/my_teacher_courses.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/shared/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -118,7 +120,21 @@ class _MainDrawerState extends State<MainDrawer>{
                   },
                 ),
             ),
-
+            new Visibility(
+              visible: currentUser.userType == 'Teacher',
+              child: ListTile(
+                leading: Icon(Icons.settings),
+                title: Text(
+                  'My Teaching Courses',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => MyTeachingCourses()));
+                },
+              ),
+            ),
             ListTile(
               leading: Icon(Icons.settings),
               title: Text(
@@ -132,6 +148,18 @@ class _MainDrawerState extends State<MainDrawer>{
               },
             ),
             ListTile(
+              leading: Icon(Icons.settings),
+              title: Text(
+                'Home',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.arrow_back),
               title: Text(
                 'Logout',
@@ -139,7 +167,9 @@ class _MainDrawerState extends State<MainDrawer>{
                   fontSize: 18,
                 ),
               ),
-              onTap: null,
+              onTap: () async {
+                await authService.signOut();
+              },
             )
           ],
         )
