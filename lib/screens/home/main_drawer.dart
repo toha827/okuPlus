@@ -96,18 +96,6 @@ class _MainDrawerState extends State<MainDrawer>{
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text(
-                'Home',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
-              },
-            ),
-            ListTile(
               leading: Icon(Icons.person),
               title: Text(
                 'Courses',

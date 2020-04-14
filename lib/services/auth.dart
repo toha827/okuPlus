@@ -73,10 +73,12 @@ class AuthService {
     try {
       AuthResult result = await _auth.signInWithEmailAndPassword(email: email, password: password);
       FirebaseUser user = result.user;
-      if (user.isEmailVerified) {
-        return _userFromFirebaeUser(user);
+      if (user == null ){
+        return null;
       }
-      return null;
+      //if (user.isEmailVerified) {
+        return _userFromFirebaeUser(user);
+      //}
     } catch(e) {
       print(e.toString());
       return null;

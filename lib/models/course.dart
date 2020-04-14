@@ -5,7 +5,9 @@ class Course {
   String description;
   String teacherId;
   String tag;
-  Course({this.id, this.name, this.image, this.description, this.teacherId, this.tag});
+  String lesson;
+
+  Course({this.id, this.name, this.image, this.description, this.teacherId, this.tag, this.lesson});
 
   Map<String,dynamic> toMap(){
     var map = new Map<String,dynamic>();
@@ -15,6 +17,7 @@ class Course {
     map['description'] = description;
     map['teacherId'] = teacherId;
     map['tag'] = tag;
+    map['lesson'] = lesson;
     return map;
   }
   Course.fromMap(Map<String,dynamic> map){
@@ -24,5 +27,6 @@ class Course {
     this.description = map['description'] ?? '';
     this.teacherId = map['teacherId'] ?? '';
     this.tag = map['tag'];
+    this.lesson = map['lesson'];
   }
 }

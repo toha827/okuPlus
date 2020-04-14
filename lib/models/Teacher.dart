@@ -25,7 +25,7 @@ class Teacher {
   Map<String,dynamic> toMap(){
     var map = new Map<String,dynamic>();
     map['uid'] = uid;
-    map['teacherCourses'] = teacherCourses.map((e) => e.toMap()).toList();
+    map['teacherCourses'] = teacherCourses != null ? teacherCourses.map((e) => e.toMap()).toList() : [];
     return map;
   }
 }

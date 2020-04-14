@@ -6,6 +6,7 @@ import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/TeacherCourse.dart';
 import 'package:flutterapp/models/course.dart';
 import 'package:flutterapp/models/myCourse.dart';
+import 'package:flutterapp/screens/home/course/video_course.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/myCourses.dart';
 import 'package:flutterapp/services/teacher_service.dart';
@@ -136,6 +137,16 @@ class _CourseDetailState extends State<CourseDetail> {
                     ],
                   ),
                 ),
+                ListTile(
+                  leading: Text("Lessons"),
+                ),
+                ListTile(
+                  leading: Icon(Icons.video_library),
+                  title: Text("Promo Video"),
+                  onTap: () => {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCourse(course.lesson)))
+                  },
+                ),
                 new Visibility(
                       visible: !isBought,
                       child: RaisedButton(
@@ -149,6 +160,7 @@ class _CourseDetailState extends State<CourseDetail> {
                             _teacher.teacherCourses.forEach((element) {
                               if( element.courseId == course.id) {
                                 element.students.add(uid);
+                                element.timestamp.add(DateTime.now());
                               }
                             });
                             _teacherService.updateTeacher(_teacher);
