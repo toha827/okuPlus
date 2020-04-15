@@ -36,7 +36,6 @@ class _HomePageState extends State<HomePage> {
     _auth.CurrentUser.listen((event) {
       setState(() {
         currUser = event.displayName;
-        startTimer();
       });
     });
     _db.courses.listen((event) {
@@ -61,29 +60,6 @@ class _HomePageState extends State<HomePage> {
 
 
   // METHODS
-
-  Timer _timer;
-  int _start = 2;
-
-  void startTimer() {
-    const oneSec = const Duration(seconds: 1);
-    _timer = new Timer.periodic(
-      oneSec,
-          (Timer timer) => setState(
-            () {
-          if (_start < 1) {
-            setState(() {
-              isWelcome = true;
-
-            });
-            timer.cancel();
-          } else {
-            _start = _start - 1;
-          }
-        },
-      ),
-    );
-  }
 
   void _filterCourses(value) {
     setState(() {
