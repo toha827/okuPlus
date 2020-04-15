@@ -470,13 +470,7 @@ class _ProfileState extends State<Profile>{
                         currUser.userPurpose = _currentUserPurpose;
                         currUser.userType = _currentUserType;
                         currUser.birthDate = birthDate;
-                        if (_image != null) {
-                          await _authService.uploadFile(_image).then((value) =>
-                              value.getDownloadURL().then((url) =>
-                              currUser.photoURL = url
-                              )
-                          );
-                        }
+
                         _authService.updateUserData(currUser.uid, currUser);
                       setState(() {
                         _status = true;
@@ -579,8 +573,15 @@ class _ProfileState extends State<Profile>{
   File _image;
   Future chooseFile() async {
     await ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
-      setState(() {
+      setState(() async {
         _image = image;
+        if (_image != null) {
+          await _authService.uploadFile(_image).then((value) =>
+              value.getDownloadURL().then((url) =>
+              currUser.photoURL = url
+              )
+          );
+        }
       });
     });
   }

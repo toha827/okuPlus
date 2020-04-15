@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ import 'package:flutterapp/services/database.dart';
 import 'package:flutterapp/services/teacher_service.dart';
 import 'package:flutterapp/shared/constants.dart';
 import 'package:flutterapp/shared/loading.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddCourse extends StatefulWidget {
   @override
@@ -18,6 +21,8 @@ class AddCourse extends StatefulWidget {
 
 class _AddCourseState extends State<AddCourse> {
 
+  AuthService _authService = new AuthService();
+  String photoUrl = '';
   final _formKey = GlobalKey<FormState>();
 
   final AuthService _auth = AuthService();
@@ -74,6 +79,56 @@ class _AddCourseState extends State<AddCourse> {
             key: _formKey,
             child: Column(
               children: <Widget>[
+                new Container(
+                  height: 250.0,
+                  color: Colors.white,
+                  child: new Column(
+                    children: <Widget>[
+
+                      Padding(
+                        padding: EdgeInsets.only(top: 20.0),
+                        child: new Stack(fit: StackFit.loose, children: <Widget>[
+                          new Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              new Container(
+                                  width: 140.0,
+                                  height: 140.0,
+                                  decoration: new BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: new DecorationImage(
+                                      image: new NetworkImage(photoUrl),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )),
+                            ],
+                          ),
+                          Padding(
+                              padding: EdgeInsets.only(top: 90.0, right: 100.0),
+                              child: new Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  GestureDetector(
+                                    onTap: () {
+                                      chooseFile();
+                                    },
+                                    child:  new CircleAvatar(
+                                      backgroundColor: Colors.red,
+                                      radius: 25.0,
+                                      child: new Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              )),
+                        ]),
+                      )
+                    ],
+                  ),
+                ),
                 SizedBox(height: 20.0),
                 TextFormField(
                   decoration: textInputDecoration.copyWith(hintText: 'Course Name'),
@@ -104,7 +159,7 @@ class _AddCourseState extends State<AddCourse> {
 
                       teacher.teacherCourses.add(TeacherCourse(courseId: count,students: []));
                       dynamic res = teacherService.updateTeacher(teacher);
-                      dynamic result = await _dbService.addPost(Course.fromMap({'id': count, 'name': name, 'image': '', 'teacherId': teacher.uid, 'description': description}));
+                      dynamic result = await _dbService.addPost(Course.fromMap({'id': count, 'name': name, 'image': photoUrl, 'teacherId': teacher.uid, 'description': description}));
                       if (result == null) {
                         setState(() => {
                           error = 'Could not sing in with those credentials',
@@ -125,5 +180,21 @@ class _AddCourseState extends State<AddCourse> {
           )
       ),
     );
+  }
+
+  File _image;
+  Future chooseFile() async {
+    await ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
+      setState(() async {
+        _image = image;
+        if (_image != null) {
+          await _authService.uploadFile(_image).then((value) =>
+              value.getDownloadURL().then((url) =>
+              photoUrl = url
+              )
+          );
+        }
+      });
+    });
   }
 }

@@ -1,8 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_circular_chart/flutter_circular_chart.dart';
+import 'package:flutterapp/models/Teacher.dart';
+import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/home/main_drawer.dart';
+import 'package:flutterapp/services/auth.dart';
+import 'package:flutterapp/services/teacher_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 
@@ -13,8 +18,55 @@ class MyStatistics extends StatefulWidget {
 }
 
 class _MyStatisticsState extends State<MyStatistics> {
-  var data = [12000.0,24000.0,30000.0,50000.0];
+  TeacherService _teacherService;
+  final Firestore _db = Firestore.instance;
+  final AuthService _auth = AuthService();
+  Teacher currTeacher;
+  double balance = 0.0;
+  var data = [0.0];
   var data1 = [12000.0,24000.0,30000.0,50000.0];
+
+  int studentsCount = 0;
+  @override
+  void initState() {
+    _auth.CurrentUser.listen((event) {
+      setState(() {
+        _teacherService = TeacherService(uid: event.uid);
+        _teacherService.getTeacher().listen((event) {
+          currTeacher = event;
+          currTeacher.teacherCourses.forEach((element) {
+            double sum = 0.0;
+            for(int i = 0; i < element.students.length; i++) {
+              sum += 50000.0;
+            }
+            setState(() {
+              if (sum > 0) {
+                data.add(sum);
+                balance += sum;
+              }
+            });
+          });
+        });
+      });
+    });
+    super.initState();
+  }
+
+  Stream<List<User>> teacherCountStream() {
+    return _db.collection('users').where('userType', isEqualTo: "Teacher").snapshots()
+        .map(_coursesListFromSnapshot);
+  }
+
+  Stream<List<User>> studentsCountStream() {
+    return _db.collection('users').where('userType', isEqualTo: "Student").snapshots()
+        .map(_coursesListFromSnapshot);
+  }
+
+  List<User> _coursesListFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((doc){
+      return User.fromMap(doc.data);
+    }).toList();
+  }
 
   List<CircularStackEntry> circularData = <CircularStackEntry>[
     new CircularStackEntry(
@@ -259,22 +311,28 @@ class _MyStatisticsState extends State<MyStatistics> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: mychart1Items("Sales by Month","421.3M","+12.9% of target"),
+              child: mychart1Items("My Balance",balance.toString(),"+12.9% of target"),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: myCircularItems("Quarterly Profits","68.7M"),
             ),
-            Padding(
-              padding: const EdgeInsets.only(right:8.0),
-              child: myTextItems("Balance","48.6M"),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.only(right:8.0),
-              child: myTextItems("Students","25.5M"),
-            ),
-
+            StreamBuilder<List<User>>(
+                stream: teacherCountStream(),
+                builder: (context, snapshot) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: myTextItems("Teachers", snapshot.data.length.toString()),
+                  );
+                }),
+            StreamBuilder<List<User>>(
+            stream: studentsCountStream(),
+            builder: (context, snapshot) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: myTextItems("Students", snapshot.data.length.toString()),
+              );
+            }),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: mychart2Items("Conversion","0.9M","+19% of target"),

@@ -6,6 +6,7 @@ import 'package:flutterapp/screens/home/home.dart';
 import 'package:flutterapp/screens/home/homepage.dart';
 import 'package:flutterapp/screens/home/my_statistics.dart';
 import 'package:flutterapp/screens/home/profile.dart';
+import 'package:flutterapp/screens/home/schedule/schedule.dart';
 import 'package:flutterapp/screens/home/settings.dart';
 import 'package:flutterapp/screens/home/myCourses.dart';
 import 'package:flutterapp/screens/teacher/my_teacher_courses.dart';
@@ -93,6 +94,18 @@ class _MainDrawerState extends State<MainDrawer>{
               ),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text(
+                'Schedule',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => MySchedule()));
               },
             ),
             ListTile(

@@ -3,14 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/models/course.dart';
 import 'package:flutterapp/models/user.dart';
-import 'package:flutterapp/screens/home/course_detail.dart';
+import 'file:///C:/Users/Fixer/Desktop/app/flutter_app/lib/screens/home/course/course_detail.dart';
 import 'package:flutterapp/screens/wrapper.dart';
-import 'course_list.dart';
+import 'course/course_list.dart';
 import 'package:flutterapp/screens/home/main_drawer.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/database.dart';
 import 'package:provider/provider.dart';
-import 'add_course.dart';
+import 'course/add_course.dart';
 
 class Home extends StatelessWidget {
 

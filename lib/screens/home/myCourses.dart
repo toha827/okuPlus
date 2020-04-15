@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutterapp/models/course.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/wrapper.dart';
-import 'course_list.dart';
+import 'course/course_list.dart';
 import 'package:flutterapp/screens/home/main_drawer.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/myCourses.dart';
 import 'package:provider/provider.dart';
-import 'add_course.dart';
+import 'course/add_course.dart';
 
 
 class MyCoursesView extends StatelessWidget {

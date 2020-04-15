@@ -9,7 +9,6 @@ import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/services/database.dart';
 import 'package:flutterapp/services/teacher_service.dart';
-import 'package:flutterapp/services/users.dart';
 import 'package:flutterapp/shared/constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:rxdart/rxdart.dart';
@@ -19,7 +18,6 @@ import 'package:path/path.dart' as Path;
 class AuthService {
 
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final Api _usersApi = new Api('users');
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Firestore _db = Firestore.instance;
   TeacherService teacherService;
@@ -54,18 +52,6 @@ class AuthService {
     return _auth.onAuthStateChanged
    //     .map((FirebaseUser user) => _userFromFirebaeUser(user));
     .map((_userFromFirebaeUser));
-  }
-
-  // sign In Anon
-  Future signInAnon() async {
-    try {
-      AuthResult result = await _auth.signInAnonymously();
-      FirebaseUser user = result.user;
-      return _userFromFirebaeUser(user);
-    } catch(e) {
-      print(e.toString());
-      return null;
-    }
   }
 
   // sign in with email & password

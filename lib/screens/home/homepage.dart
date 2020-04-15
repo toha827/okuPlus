@@ -1,16 +1,20 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/models/course.dart';
 import 'package:flutterapp/models/user.dart';
-import 'package:flutterapp/screens/home/course_detail.dart';
+import 'package:flutterapp/screens/home/home.dart';
+import 'file:///C:/Users/Fixer/Desktop/app/flutter_app/lib/screens/home/course/course_detail.dart';
 import 'package:flutterapp/screens/wrapper.dart';
-import 'course_list.dart';
+import 'course/course_list.dart';
 import 'package:flutterapp/screens/home/main_drawer.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/database.dart';
 import 'package:provider/provider.dart';
-import 'add_course.dart';
+import 'course/add_course.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -21,16 +25,34 @@ class _HomePageState extends State<HomePage> {
 
   final AuthService _auth = AuthService();
   final DatabaseService _db = DatabaseService();
-  List<Course> courses = [];
-  List<Course> filteredCourses = [];
+  List<String> courses = [];
+  List<String> filteredCourses = [];
+  String currUser;
   bool isTeacher = false;
   bool isSearching = false;
-
+  bool isWelcome = false;
   @override
   void initState() {
+    _auth.CurrentUser.listen((event) {
+      setState(() {
+        currUser = event.displayName;
+        startTimer();
+      });
+    });
     _db.courses.listen((event) {
       setState(() {
-        courses = filteredCourses = event;
+        event.forEach((element) {
+          bool isExist = false;
+          filteredCourses.forEach((el2) {
+            if (el2 == element.tag){
+              isExist = true;
+            }
+          });
+          if (!isExist) {
+            filteredCourses.add(element.tag);
+          }
+        });
+        courses = filteredCourses;
       });
     });
 
@@ -40,12 +62,34 @@ class _HomePageState extends State<HomePage> {
 
   // METHODS
 
+  Timer _timer;
+  int _start = 2;
+
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+          (Timer timer) => setState(
+            () {
+          if (_start < 1) {
+            setState(() {
+              isWelcome = true;
+
+            });
+            timer.cancel();
+          } else {
+            _start = _start - 1;
+          }
+        },
+      ),
+    );
+  }
+
   void _filterCourses(value) {
     setState(() {
       filteredCourses = courses
           .where((course) =>
-            course.description.toLowerCase().contains(value.toLowerCase()) ||
-            course.name.toLowerCase().contains(value.toLowerCase())
+            course.toLowerCase().contains(value.toLowerCase())
           ).toList();
     });
   }
@@ -107,7 +151,7 @@ class _HomePageState extends State<HomePage> {
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
                 title: Text(
-                  "Homepage",
+                  "Welcome to OkuPlus " + currUser,
                   style: TextStyle(
                     color: Colors.black87,
                     fontSize: 20.0,
@@ -128,7 +172,7 @@ class _HomePageState extends State<HomePage> {
             SliverGrid(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 ///no.of items in the horizontal axis
-                crossAxisCount: 2,
+                crossAxisCount: 3,
               ),
               ///Lazy building of list
               delegate: SliverChildBuilderDelegate(
@@ -163,8 +207,8 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-  Widget listItem(Course course, context) => Container(
-    height: 300.0,
+  Widget listItem(String course, context) => Container(
+    height: 50.0,
     color: Colors.white,
     child: Center(
       child: Card(
@@ -172,19 +216,14 @@ class _HomePageState extends State<HomePage> {
         clipBehavior: Clip.antiAliasWithSaveLayer,
         child: Column(
           children: <Widget>[
-            Image(
-              height: 100,
-              width: 100,
-              image: NetworkImage(course.image),
-              fit: BoxFit.fill,
-            ),
+
             ListTile(
                 onTap: () async {
                   String uid;
                   await _auth.CurrentUser.listen((event) { uid = event.uid; });
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => CourseDetail(course, uid)));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
                 },
-                title: Text(course.name)
+                title: Text(course)
             )
           ],
         ),
