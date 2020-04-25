@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/models/course.dart';
-import 'file:///C:/Users/Fixer/Desktop/app/flutter_app/lib/screens/home/course/course_detail.dart';
+import 'package:flutterapp/screens/home/course/course_detail.dart';
 import 'package:provider/provider.dart';
 
 class CourseList extends StatefulWidget {

@@ -12,7 +12,7 @@ class User {
   String userState;
   String userInterest;
   String userPurpose;
-
+  List<String> subscribers;
   User({
     this.uid,
     this.fullName,
@@ -23,7 +23,8 @@ class User {
     this.userType,
     this.userState,
     this.userInterest,
-    this.userPurpose
+    this.userPurpose,
+    this.subscribers
   });
 
   User.map(dynamic obj) {
@@ -34,6 +35,7 @@ class User {
     this.birthDate = obj['birthDate'];
     this.photoURL = obj['photoURL'];
     this.userType = obj['userType'];
+    this.subscribers = obj['subscribers'];
   }
 
 //  String get uid => _uid;
@@ -57,6 +59,8 @@ class User {
     this.userState = map['userState'] ?? '';
     this.userPurpose = map['userPurpose'] ?? '';
     this.userInterest = map['userInterest'] ?? '';
+    List<dynamic> parsedJson = map['subscribers'] ?? [];
+    this.subscribers = parsedJson.map((e) => e.toString()).toList();
   }
 
   Map<String,dynamic> toMap(){
@@ -71,6 +75,7 @@ class User {
     map['userState'] = userState;
     map['userInterest'] = userInterest;
     map['userPurpose'] = userPurpose;
+    map['subscribers'] = subscribers;
     return map;
   }
 }

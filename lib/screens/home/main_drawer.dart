@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/home/home.dart';
 import 'package:flutterapp/screens/home/homepage.dart';
-import 'package:flutterapp/screens/home/my_statistics.dart';
 import 'package:flutterapp/screens/home/profile.dart';
+import 'package:flutterapp/screens/home/promo.dart';
 import 'package:flutterapp/screens/home/schedule/schedule.dart';
 import 'package:flutterapp/screens/home/settings.dart';
 import 'package:flutterapp/screens/home/myCourses.dart';
+import 'package:flutterapp/screens/home/statistics/my_statistics.dart';
 import 'package:flutterapp/screens/teacher/my_teacher_courses.dart';
 import 'package:flutterapp/screens/wrapper.dart';
 import 'package:flutterapp/services/auth.dart';
@@ -31,9 +32,9 @@ class _MainDrawerState extends State<MainDrawer>{
   void initState() {
 
     authService.profile.listen((event) {
-        setState(() {
-          this.currentUser = User.fromMap(event);
-        });
+      setState(() {
+        this.currentUser = User.fromMap(event);
+      });
     });
 
     super.initState();
@@ -55,24 +56,24 @@ class _MainDrawerState extends State<MainDrawer>{
                       width: 100,
                       height: 100,
                       margin: EdgeInsets.only(
-                        top: 30,
-                        bottom: 10
+                          top: 30,
+                          bottom: 10
                       ),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
                             image: NetworkImage(
-                              currentUser.photoURL ?? 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
+                                currentUser.photoURL ?? 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
 //                                'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
                             fit: BoxFit.fill),
                       ),
-                     ),
+                    ),
                     Text(
-                      currentUser.displayName,
-                      style: TextStyle(
-                        fontSize: 22,
-                        color: Colors.white,
-                      )
+                        currentUser.displayName,
+                        style: TextStyle(
+                          fontSize: 22,
+                          color: Colors.white,
+                        )
                     ),
                     Text(
                         currentUser.email,
@@ -87,17 +88,29 @@ class _MainDrawerState extends State<MainDrawer>{
             ListTile(
               leading: Icon(Icons.person),
               title: Text(
-                  'Profile',
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
+                'Profile',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
               ),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
               },
             ),
             ListTile(
-              leading: Icon(Icons.person),
+              leading: Icon(Icons.card_giftcard),
+              title: Text(
+                'Promo',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Promo()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.calendar_today),
               title: Text(
                 'Schedule',
                 style: TextStyle(
@@ -109,7 +122,7 @@ class _MainDrawerState extends State<MainDrawer>{
               },
             ),
             ListTile(
-              leading: Icon(Icons.person),
+              leading: Icon(Icons.view_list),
               title: Text(
                 'Courses',
                 style: TextStyle(
@@ -121,24 +134,24 @@ class _MainDrawerState extends State<MainDrawer>{
               },
             ),
             new Visibility(
-                visible: currentUser.userType == 'Student',
-                child: ListTile(
-                  leading: Icon(Icons.settings),
-                  title: Text(
-                    'My Courses',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
+              visible: currentUser.userType == 'Student',
+              child: ListTile(
+                leading: Icon(Icons.personal_video),
+                title: Text(
+                  'My Courses',
+                  style: TextStyle(
+                    fontSize: 18,
                   ),
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => MyCoursesView()));
-                  },
                 ),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => MyCoursesView()));
+                },
+              ),
             ),
             new Visibility(
               visible: currentUser.userType == 'Teacher' || currentUser.userType == 'Admin',
               child: ListTile(
-                leading: Icon(Icons.settings),
+                leading: Icon(Icons.graphic_eq),
                 title: Text(
                   'My Statistics',
                   style: TextStyle(
@@ -153,7 +166,7 @@ class _MainDrawerState extends State<MainDrawer>{
             new Visibility(
               visible: currentUser.userType == 'Teacher',
               child: ListTile(
-                leading: Icon(Icons.settings),
+                leading: Icon(Icons.short_text),
                 title: Text(
                   'My Teaching Courses',
                   style: TextStyle(

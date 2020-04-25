@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/models/course.dart';
 import 'package:flutterapp/models/user.dart';
-import 'file:///C:/Users/Fixer/Desktop/app/flutter_app/lib/screens/home/course/course_detail.dart';
+import 'package:flutterapp/screens/home/course/course_detail.dart';
 import 'package:flutterapp/screens/wrapper.dart';
 import 'course/course_list.dart';
 import 'package:flutterapp/screens/home/main_drawer.dart';

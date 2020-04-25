@@ -6,6 +6,7 @@ import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/TeacherCourse.dart';
 import 'package:flutterapp/models/course.dart';
 import 'package:flutterapp/models/myCourse.dart';
+import 'package:flutterapp/screens/home/course/test.dart';
 import 'package:flutterapp/screens/home/course/video_course.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/myCourses.dart';
@@ -14,6 +15,7 @@ import 'package:flutterapp/shared/cardDetatil.dart';
 import 'package:flutterapp/shared/common.dart';
 import 'package:flutterapp/shared/loading.dart';
 import 'package:flutterapp/shared/textStyle.dart';
+
 
 class CourseDetail extends StatefulWidget {
   Course course;
@@ -32,6 +34,8 @@ class _CourseDetailState extends State<CourseDetail> {
   Teacher _teacher;
   bool isBought = false;
   List<Course> list = [];
+
+  bool isExpand = false;
   _CourseDetailState(this.course, this.uid);
   bool isLoading = true;
   final AuthService _auth = AuthService();
@@ -137,6 +141,23 @@ class _CourseDetailState extends State<CourseDetail> {
                     ],
                   ),
                 ),
+                ExpansionTile(
+                    key: PageStorageKey(this.widget.key),
+                    title: Container(
+                        width: double.infinity,
+
+                        child: Text("Course Detail",style: TextStyle(fontSize: 18))
+                    ),
+                    trailing: Icon(Icons.arrow_drop_down,size: 32,color: Colors.pink,),
+                    onExpansionChanged: (value){
+                      setState(() {
+                        isExpand=value;
+                      });
+                    },
+                    children: <Widget>[
+                      Text(course.courseDetail)
+                    ],
+                ),
                 ListTile(
                   leading: Text("Lessons"),
                 ),
@@ -146,6 +167,19 @@ class _CourseDetailState extends State<CourseDetail> {
                   onTap: () => {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCourse(course.lesson)))
                   },
+                ),
+                new Visibility(
+                visible: isBought,
+                child: RaisedButton(
+                    color: Colors.blue[400],
+                    child: Text(
+                      'Questions',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Test(questions: course.questions)));
+                    }
+                ),
                 ),
                 new Visibility(
                       visible: !isBought,

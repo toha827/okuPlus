@@ -100,6 +100,9 @@ class _MyHomePageState extends State<MySchedule> with TickerProviderStateMixin {
           Expanded(child: _buildEventList()),
         ],
       ),
+      floatingActionButton: RaisedButton(
+        child: Icon(Icons.plus_one),
+      ),
     );
   }
 
