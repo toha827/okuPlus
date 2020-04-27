@@ -92,9 +92,9 @@ class _SignInState extends State<SignIn> {
               ),
               MaterialButton(
                 child: button('Google', 'assets/google.png'),
-                onPressed: (){
+                onPressed: () async {
                   setState(() => loading = true);
-                  dynamic result = _auth.googleSignIn();
+                  dynamic result = await _auth.googleSignIn();
                   print("GOOGLE " + result.toString());
                   if (result == null) {
                     setState(() => {
@@ -110,9 +110,9 @@ class _SignInState extends State<SignIn> {
               ),
               MaterialButton(
                 child: button('Facebook', 'assets/facebook.png'),
-                onPressed: (){
+                onPressed: () async {
                   setState(() => loading = true);
-                  dynamic result = _auth.facebookSignIn();
+                  dynamic result = await _auth.facebookSignIn();
                   print("GOOGLE " + result);
                   if (result == null) {
                     setState(() => {

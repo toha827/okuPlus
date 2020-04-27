@@ -47,10 +47,14 @@ class _HomePageState extends State<HomePage> {
             }
           });
           if (!isExist) {
-            filteredCourses.add(element.tag);
+            setState(() {
+              filteredCourses.add(element.tag);
+            });
           }
         });
-        courses = filteredCourses;
+        setState(() {
+          courses = filteredCourses;
+        });
       });
     });
 

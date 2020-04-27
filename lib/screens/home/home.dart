@@ -81,7 +81,7 @@ class Home extends StatelessWidget {
               return listItem(value[index], context);
             },
             /// Set childCount to limit no.of items
-            /// childCount: 100,
+            childCount: value.length,
           ),
         )
         ],
