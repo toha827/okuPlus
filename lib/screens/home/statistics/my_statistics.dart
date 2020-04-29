@@ -398,10 +398,10 @@ class _MyStatisticsState extends State<MyStatistics> {
                 )
               );
             }),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: mychart2Items("Conversion","0.9M","+19% of target"),
-            ),
+//            Padding(
+//              padding: const EdgeInsets.all(8.0),
+//              child: mychart2Items("Conversion","0.9M","+19% of target"),
+//            ),
             Visibility(
               visible: true,
               child: Padding(

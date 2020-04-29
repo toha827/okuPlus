@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutterapp/models/course.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/home/home.dart';
@@ -16,12 +17,15 @@ import 'package:provider/provider.dart';
 import 'course/add_course.dart';
 
 class HomePage extends StatefulWidget {
+  String filter;
+  HomePage({this.filter});
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState(filter: filter);
 }
 
 class _HomePageState extends State<HomePage> {
-
+  String filter;
+  _HomePageState({this.filter});
   final AuthService _auth = AuthService();
   final DatabaseService _db = DatabaseService();
   List<String> courses = [];
@@ -30,6 +34,33 @@ class _HomePageState extends State<HomePage> {
   bool isTeacher = false;
   bool isSearching = false;
   bool isWelcome = false;
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  new FlutterLocalNotificationsPlugin();
+  var initializationSettingsAndroid;
+  var initializationSettingsIOS;
+  var initializationSettings;
+
+  void _showNotification() async {
+    await _demoNotification();
+  }
+
+  Future<void> _demoNotification() async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'channel_ID', 'channel name', 'channel description',
+        importance: Importance.Max,
+        priority: Priority.High,
+        ticker: 'test ticker');
+
+    var iOSChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(0, 'Hello, Did you pass our course',
+        'A message from our community', platformChannelSpecifics,
+        payload: 'test oayload');
+  }
+
   @override
   void initState() {
     _auth.CurrentUser.listen((event) {
@@ -57,8 +88,47 @@ class _HomePageState extends State<HomePage> {
         });
       });
     });
+    initializationSettingsAndroid =
+    new AndroidInitializationSettings('app_icon');
+    initializationSettingsIOS = new IOSInitializationSettings(
+        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+    initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
 
+    _showNotification();
     super.initState();
+
+  }
+
+  Future onSelectNotification(String payload) async {
+    if (payload != null) {
+      debugPrint('Notification payload: $payload');
+    }
+    await Navigator.push(context,
+        new MaterialPageRoute(builder: (context) => new Home()));
+  }
+
+  Future onDidReceiveLocalNotification(
+      int id, String title, String body, String payload) async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+          title: Text(title),
+          content: Text(body),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: Text('Ok'),
+              onPressed: () async {
+                Navigator.of(context, rootNavigator: true).pop();
+                await Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Home()));
+              },
+            )
+          ],
+        ));
   }
 
 
@@ -168,20 +238,14 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      floatingActionButton: StreamBuilder<bool>(
-          stream: _auth.isTeacher,
-          builder: (context, snapshot) {
-            return new Visibility(
-              visible: snapshot.data ?? false,
+      floatingActionButton:  Visibility(
+              visible: true,
               child: FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddCourse()));
-                },
+                onPressed: _showNotification,
                 child: Icon(Icons.add, color: Colors.white,),
                 foregroundColor: Colors.blue,
               ),
-            );
-          }),
+            )
     );
   }
 
