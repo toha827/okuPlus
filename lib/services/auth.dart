@@ -73,19 +73,57 @@ class AuthService {
 
   // FacebbookSignIn
   Future<FirebaseUser> facebookSignIn() async {
-    final FacebookLogin facebookSignIn = new FacebookLogin();
-    final FacebookLoginResult facebookLoginResult = await facebookSignIn.logIn(['email', 'public_profile']);
+    try {
+      final FacebookLogin facebookSignIn = new FacebookLogin();
+      final FacebookLoginResult facebookLoginResult = await facebookSignIn
+          .logIn(['email', 'public_profile']);
 
 
-    if (facebookLoginResult.status == FacebookLoginStatus.loggedIn) {
-      FacebookAccessToken facebookAccessToken = facebookLoginResult.accessToken;
-      AuthCredential authCredential = FacebookAuthProvider.getCredential(
-          accessToken: facebookAccessToken.token);
-      FirebaseUser user;
-      user = (await _auth.signInWithCredential(authCredential)).user;
+      if (facebookLoginResult.status == FacebookLoginStatus.loggedIn) {
+        FacebookAccessToken facebookAccessToken = facebookLoginResult
+            .accessToken;
+        AuthCredential authCredential = FacebookAuthProvider.getCredential(
+            accessToken: facebookAccessToken.token);
+        FirebaseUser user;
+        user = (await _auth.signInWithCredential(authCredential)).user;
+        User newUser = new User(uid: user.uid,
+            fullName: user.displayName,
+            email: user.email ?? "",
+            displayName: user.displayName,
+            birthDate: null,
+            photoURL: user.photoUrl,
+            userType: "Teacher");
+        bool isNew = false;
+        dynamic result = await userEmailExist(user.uid);
+        if (!result) {
+          updateUserData(user.uid, newUser);
+        }
+        return user;
+      } else {
+        return null;
+      }
+    } catch(e) {
+      return null;
+    }
+  }
+  // googleSign In
+  Future<FirebaseUser> googleSignIn() async {
+    try {
+      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final AuthResult authResult = await _auth.signInWithCredential(
+          credential);
+
+      final FirebaseUser user = authResult.user;
       User newUser = new User(uid: user.uid,
           fullName: user.displayName,
-          email: user.email ?? "",
+          email: user.email,
           displayName: user.displayName,
           birthDate: null,
           photoURL: user.photoUrl,
@@ -95,34 +133,12 @@ class AuthService {
       if (!result) {
         updateUserData(user.uid, newUser);
       }
+
+      final FirebaseUser currentUser = await _auth.currentUser();
       return user;
-    } else {
+    } catch(e){
       return null;
     }
-  }
-  // googleSign In
-  Future<FirebaseUser> googleSignIn() async {
-    GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    final AuthResult authResult = await _auth.signInWithCredential(credential);
-
-    final FirebaseUser user = authResult.user;
-    User newUser = new User(uid: user.uid, fullName: user.displayName, email:user.email, displayName: user.displayName, birthDate: null, photoURL: user.photoUrl, userType: "Teacher");
-    bool isNew = false;
-    dynamic result = await userEmailExist(user.uid);
-    if (!result) {
-      updateUserData(user.uid, newUser);
-    }
-
-    final FirebaseUser currentUser = await _auth.currentUser();
-
-    return user;
   }
 
   // register with email & password
