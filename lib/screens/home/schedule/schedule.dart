@@ -81,6 +81,18 @@ class _MyHomePageState extends State<MySchedule> with TickerProviderStateMixin {
     print('CALLBACK: _onCalendarCreated');
   }
 
+  DateTime newDate;
+
+  Future _selectDate() async {
+    DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: new DateTime.now(),
+        firstDate: new DateTime(2016),
+        lastDate: new DateTime(2022)
+    );
+    if(picked != null) setState(() => newDate = picked);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,6 +114,12 @@ class _MyHomePageState extends State<MySchedule> with TickerProviderStateMixin {
       ),
       floatingActionButton: RaisedButton(
         child: Icon(Icons.plus_one),
+        onPressed: () async {
+          await _selectDate();
+          setState(() {
+            _events.addAll({newDate:['New Lesson']});
+          });
+        },
       ),
     );
   }

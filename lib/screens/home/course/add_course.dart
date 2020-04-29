@@ -81,7 +81,7 @@ class _AddCourseState extends State<AddCourse> {
               children: <Widget>[
                 new Container(
                   height: 250.0,
-                  color: Colors.white,
+                  color: Colors.blue[100],
                   child: new Column(
                     children: <Widget>[
 
@@ -139,7 +139,6 @@ class _AddCourseState extends State<AddCourse> {
                 ),
                 SizedBox(height: 20.0),
                 TextFormField(
-                  obscureText: true,
                   decoration: textInputDecoration.copyWith(hintText: 'Description'),
                   validator: (val) => val.isEmpty ? 'Enter a Description' : null,
                   onChanged: (val) {
