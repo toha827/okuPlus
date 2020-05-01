@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutterapp/models/schedule.dart';
 
 class User {
 
@@ -13,6 +14,8 @@ class User {
   String userInterest;
   String userPurpose;
   List<String> subscribers;
+  List<Schedule> schedule;
+
   User({
     this.uid,
     this.fullName,
@@ -24,7 +27,8 @@ class User {
     this.userState,
     this.userInterest,
     this.userPurpose,
-    this.subscribers
+    this.subscribers,
+    this.schedule
   });
 
   User.map(dynamic obj) {
@@ -36,6 +40,7 @@ class User {
     this.photoURL = obj['photoURL'];
     this.userType = obj['userType'];
     this.subscribers = obj['subscribers'];
+    this.schedule = obj['schedule'];
   }
 
 //  String get uid => _uid;
@@ -61,6 +66,8 @@ class User {
     this.userInterest = map['userInterest'] ?? '';
     List<dynamic> parsedJson = map['subscribers'] ?? [];
     this.subscribers = parsedJson.map((e) => e.toString()).toList();
+    List<dynamic> parsedSchedule = map['schedule'] ?? [];
+    this.schedule = parsedSchedule.map((e) => new Schedule.fromMap(e)).toList();
   }
 
   Map<String,dynamic> toMap(){
@@ -76,6 +83,7 @@ class User {
     map['userInterest'] = userInterest;
     map['userPurpose'] = userPurpose;
     map['subscribers'] = subscribers;
+    map['schedule'] = schedule != null ? schedule.map((e) => e.toMap()).toList() : [];
     return map;
   }
 }

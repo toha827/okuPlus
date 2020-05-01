@@ -17,7 +17,7 @@ class _SettingsState extends State<Settings> {
   double _value = 0.0;
   var _character;
   var _value2Changed;
-  int value = 5;
+  int value = 0;
   final IconData filledStar = Icons.star;
   final IconData unfilledStar = Icons.star_half;
 
@@ -100,7 +100,9 @@ class _SettingsState extends State<Settings> {
         });
   }
   void onChanged (int index) {
-    value = index;
+    setState(() {
+      value = index;
+    });
   }
   void _setvalue(double value) => setState(() => _value = value);
 

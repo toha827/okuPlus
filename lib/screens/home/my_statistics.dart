@@ -25,7 +25,7 @@ class _MyStatisticsState extends State<MyStatistics> {
   double balance = 0.0;
   var data = [0.0];
   var data1 = [12000.0,24000.0,30000.0,50000.0];
-
+  int requestsCount = 0;
   int studentsCount = 0;
   @override
   void initState() {
@@ -34,6 +34,7 @@ class _MyStatisticsState extends State<MyStatistics> {
         _teacherService = TeacherService(uid: event.uid);
         _teacherService.getTeacher().listen((event) {
           currTeacher = event;
+          requestsCount = event.teacherRequests.length;
           currTeacher.teacherCourses.forEach((element) {
             double sum = 0.0;
             for(int i = 0; i < element.students.length; i++) {

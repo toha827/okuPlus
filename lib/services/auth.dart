@@ -24,10 +24,13 @@ class AuthService {
   Observable<Map<String, dynamic>> profile;
   Observable<FirebaseUser> CurrentUser;
   BehaviorSubject<bool> isTeacher;
+  BehaviorSubject<bool> isAdmin;
 
   AuthService(){
     isTeacher = BehaviorSubject<bool>();
+    isAdmin = BehaviorSubject<bool>();
     isTeacher.add(false);
+    isAdmin.add(false);
     CurrentUser = Observable(_auth.onAuthStateChanged);
 
     profile = CurrentUser.switchMap((FirebaseUser u) {
@@ -39,6 +42,7 @@ class AuthService {
     });
     profile.listen((event) {
       isTeacher.add(User.fromMap(event).userType == "Teacher");
+      isAdmin.add(User.fromMap(event).userType == "Admin");
     });
   }
 

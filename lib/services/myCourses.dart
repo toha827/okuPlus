@@ -27,7 +27,7 @@ class MyCoursesService {
     return MyCourse.fromJson(snapshot.data['myCourses']).myCourses;
   }
 
-  Stream<List<Course>> get courses {
+  Stream<List<Course>> get  courses {
     return coursesCollection.document(uid).snapshots()
       .map(_coursesListFromSnapshot);
   }

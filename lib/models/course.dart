@@ -10,7 +10,7 @@ class Course {
   String lesson;
   String courseDetail;
   List<Question> questions;
-
+  DateTime course_date;
   Course({
     this.id,
     this.name,
@@ -20,7 +20,8 @@ class Course {
     this.tag,
     this.lesson,
     this.questions,
-    this.courseDetail
+    this.courseDetail,
+    this.course_date
   });
 
   Map<String,dynamic> toMap(){
@@ -31,6 +32,7 @@ class Course {
     map['description'] = description;
     map['teacherId'] = teacherId ?? "";
     map['tag'] = tag ?? "";
+    map['course_date'] = course_date;
     map['lesson'] = lesson ?? "";
     map['courseDetail'] = courseDetail ?? "";
     map['questions'] = questions == null ? [] : questions.map((e) => e.toMap()).toList();
@@ -43,6 +45,7 @@ class Course {
     this.description = map['description'] ?? '';
     this.teacherId = map['teacherId'] ?? '';
     this.tag = map['tag'];
+    this.course_date = DateTime.fromMillisecondsSinceEpoch(map['course_date'] == null ? new DateTime.now().millisecondsSinceEpoch : map['course_date'].seconds * 1000);
     this.lesson = map['lesson'];
     this.courseDetail = map['courseDetail'] ?? '';
     List<dynamic> parsedJson = map['questions'] ?? [];

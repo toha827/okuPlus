@@ -1,11 +1,15 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/TeacherCourse.dart';
+import 'package:flutterapp/models/TeacherRequest.dart';
 import 'package:flutterapp/models/course.dart';
 import 'package:flutterapp/models/myCourse.dart';
+import 'package:flutterapp/models/schedule.dart';
+import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/home/course/test.dart';
 import 'package:flutterapp/screens/home/course/video_course.dart';
 import 'package:flutterapp/services/auth.dart';
@@ -29,16 +33,19 @@ class CourseDetail extends StatefulWidget {
 class _CourseDetailState extends State<CourseDetail> {
   Course course;
   String uid;
+  User CurrUser;
   MyCoursesService _myCoursesService;
   TeacherService _teacherService;
   Teacher _teacher;
   bool isBought = false;
+  bool isStudent = false;
   List<Course> list = [];
 
   bool isExpand = false;
   _CourseDetailState(this.course, this.uid);
   bool isLoading = true;
   final AuthService _auth = AuthService();
+  final Firestore _db = Firestore.instance;
   @override
   void initState() {
     _auth.CurrentUser.listen((event) {
@@ -46,6 +53,14 @@ class _CourseDetailState extends State<CourseDetail> {
         uid = event.uid;
         _myCoursesService = MyCoursesService(event.uid);
         _teacherService = TeacherService(uid: course.teacherId);
+      });
+      _auth.profile.listen((event) {
+        isStudent = User.fromMap(event).userType == "Student";
+      });
+      _db.collection('users').document(uid).snapshots().listen((event) {
+        setState(() {
+          CurrUser = User.fromMap(event.data);
+        });
       });
       _myCoursesService.courses.listen((el) {
         list = el ?? new List<Course>();
@@ -133,6 +148,27 @@ class _CourseDetailState extends State<CourseDetail> {
                   child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(5, (index) {
+                          return IconButton(
+                            onPressed: onChanged != null
+                                ? () {
+                              onChanged(_teacher.rating == index + 1 ? index : index + 1);
+                            }
+                                : null,
+                            color: index < _teacher.rating ? Colors.amber : null,
+                            iconSize: 26.0,
+                            icon: Icon(
+                              index < _teacher.rating
+                                  ? filledStar ?? Icons.star
+                                  : unfilledStar ?? Icons.star_border,
+                            ),
+                            padding: EdgeInsets.zero,
+                            tooltip: "${index + 1} of 5",
+                          );
+                        }),
+                      ),
                       new Text(course.name,
                         style: Style.headerTextStyle,),
                       new Separator(),
@@ -168,8 +204,21 @@ class _CourseDetailState extends State<CourseDetail> {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCourse(course.lesson)))
                   },
                 ),
+                ButtonTheme(
+                    buttonColor: Colors.amber,
+                    minWidth: 50.0,
+                    height: 20.0,
+                    child: RaisedButton(
+                        child: Icon(Icons.queue),
+                        onPressed: () async {
+                          await _selectDate();
+                          TeacherRequest request = TeacherRequest(studentId: uid, courseId: course.id, timestamp: requestDate,submitted: false);
+                          _teacher.teacherRequests.add(request);
+                          await _teacherService.updateTeacher(_teacher);
+                        })
+                ),
                 new Visibility(
-                visible: isBought,
+                visible: isBought && isStudent,
                 child: RaisedButton(
                     color: Colors.blue[400],
                     child: Text(
@@ -182,7 +231,7 @@ class _CourseDetailState extends State<CourseDetail> {
                 ),
                 ),
                 new Visibility(
-                      visible: !isBought,
+                      visible: !isBought && isStudent,
                       child: RaisedButton(
                           color: Colors.blue[400],
                           child: Text(
@@ -190,11 +239,14 @@ class _CourseDetailState extends State<CourseDetail> {
                             style: TextStyle(color: Colors.white),
                           ),
                           onPressed: () {
+                            CurrUser.schedule.add(new Schedule(name: course.name, desc: "Lesson", complete: false, complete_date: course.course_date));
+                            _auth.updateUserData(uid, CurrUser);
                             list.add(course);
                             _teacher.teacherCourses.forEach((element) {
                               if( element.courseId == course.id) {
                                 element.students.add(uid);
                                 element.timestamp.add(DateTime.now());
+                                element.confirmed.add(false);
                               }
                             });
                             _teacherService.updateTeacher(_teacher);
@@ -207,6 +259,28 @@ class _CourseDetailState extends State<CourseDetail> {
           );
         });
 
+  }
+
+  DateTime requestDate;
+
+  Future _selectDate() async {
+    DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: new DateTime.now(),
+        firstDate: new DateTime(2016),
+        lastDate: new DateTime(2022)
+    );
+    if(picked != null) setState(() => requestDate = picked);
+  }
+
+  final IconData filledStar = Icons.star;
+  final IconData unfilledStar = Icons.star_border;
+
+  void onChanged (int index) {
+    setState(() {
+      _teacher.rating = ((_teacher.rating + index)/2).toInt();
+      _teacherService.updateTeacher(_teacher);
+    });
   }
 
   Container _getToolbar(BuildContext context) {

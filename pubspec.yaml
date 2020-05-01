@@ -46,6 +46,9 @@ dependencies:
   flutter_calendar_carousel: ^1.4.12
   device_calendar: ^3.1.0
   flutter_local_notifications: ^1.4.2
+  pdf: ^1.7.1
+  flutter_full_pdf_viewer: ^1.0.6
+  path_provider: ^1.5.1
   rxdart: 0.20.0
 
 dev_dependencies:

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/TeacherCourse.dart';
 import 'package:flutterapp/models/course.dart';
+import 'package:flutterapp/models/question.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/database.dart';
@@ -34,9 +35,10 @@ class _AddCourseState extends State<AddCourse> {
   String name = '';
   String image = '';
   String description = '';
+  String courseDetails = '';
   int count;
   String error = '';
-
+  List<Question> questions = [];
   bool loading = false;
 
   @override
@@ -61,6 +63,78 @@ class _AddCourseState extends State<AddCourse> {
     super.initState();
   }
 
+  Future<Question> createQuestionDialog(BuildContext context){
+    Question newQuestion = new Question();
+    TextEditingController descriptionTextController = TextEditingController();
+    TextEditingController answerTextController = TextEditingController();
+    TextEditingController variantTextController = TextEditingController();
+    List<String> variants = [];
+    return showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text("Enter the Question"),
+        content: Column(
+          children: <Widget>[
+            ListTile(
+              leading: Icon(Icons.description),
+              title: TextField(
+                controller: descriptionTextController,
+              ),
+              subtitle: Text("Description"),
+            ),
+
+            ListTile(
+              leading: Icon(Icons.question_answer),
+              title: TextField(
+                controller: variantTextController,
+              ),
+              subtitle: Text("Variant"),
+              trailing: ButtonTheme(
+                minWidth: 50.0,
+                height: 20.0,
+                child: RaisedButton(
+                  child: Icon(Icons.add),
+                  onPressed: () {
+                    if(variantTextController.text.trim() != ""){
+                      setState(() {
+                        variants.add(variantTextController.text.trim().toString());
+                        variantTextController.text = "";
+                      });
+                    }
+                  })
+              )
+            ),
+            ListTile(
+              leading: Icon(Icons.call_missed_outgoing),
+              title: TextField(
+                controller: answerTextController,
+              ),
+              subtitle: Text("Answer"),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          MaterialButton(
+            elevation: 3.0,
+            child: Text("Add Question"),
+            onPressed: (){
+              if(descriptionTextController.text.trim() != ""
+                && answerTextController.text.trim() != ""
+                && variants.length > 0){
+                Navigator.of(context)
+                    .pop(
+                      new Question(
+                        description: descriptionTextController.text.toString(),
+                        answer: answerTextController.text.toString(),
+                        questions: variants
+                      )
+                );
+              }
+            },
+          )
+        ],
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,78 +148,94 @@ class _AddCourseState extends State<AddCourse> {
         ],
       ),
       body: Container(
-          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 0.0),
           child: Form(
             key: _formKey,
             child: Column(
               children: <Widget>[
-                new Container(
-                  height: 250.0,
-                  color: Colors.blue[100],
-                  child: new Column(
-                    children: <Widget>[
-
-                      Padding(
-                        padding: EdgeInsets.only(top: 20.0),
-                        child: new Stack(fit: StackFit.loose, children: <Widget>[
-                          new Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              new Container(
-                                  width: 140.0,
-                                  height: 140.0,
-                                  decoration: new BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: new DecorationImage(
-                                      image: new NetworkImage(photoUrl),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )),
-                            ],
-                          ),
-                          Padding(
-                              padding: EdgeInsets.only(top: 90.0, right: 100.0),
-                              child: new Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  GestureDetector(
-                                    onTap: () {
-                                      chooseFile();
-                                    },
-                                    child:  new CircleAvatar(
-                                      backgroundColor: Colors.red,
-                                      radius: 25.0,
-                                      child: new Icon(
-                                        Icons.camera_alt,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              )),
-                        ]),
-                      )
-                    ],
+                ListTile(
+                  leading: Icon(Icons.image),
+                  title: Text(photoUrl == "" ? "Select Image" : "Image selected"),
+                  trailing: GestureDetector(
+                    onTap: () {
+                      chooseFile();
+                    },
+                    child:  new CircleAvatar(
+                      backgroundColor: Colors.red,
+                      radius: 25.0,
+                      child: new Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
-                SizedBox(height: 20.0),
-                TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Course Name'),
-                  validator: (val) => val.isEmpty ? 'Enter a Name' : null,
-                  onChanged: (val) {
-                    setState(() => name = val);
-                  },
+                SizedBox(height: 5.0),
+                ListTile(
+                  leading: Icon(Icons.filter_none),
+                  title: TextFormField(
+                    decoration: textInputDecoration.copyWith(hintText: 'Course Name'),
+                    validator: (val) => val.isEmpty ? 'Enter a Name' : null,
+                    onChanged: (val) {
+                      setState(() => name = val);
+                    },
+                  ),
                 ),
-                SizedBox(height: 20.0),
-                TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Description'),
-                  validator: (val) => val.isEmpty ? 'Enter a Description' : null,
-                  onChanged: (val) {
-                    setState(() => description = val);
-                  },
+                SizedBox(height: 5.0),
+                ListTile(
+                  leading: Icon(Icons.description),
+                  title: TextFormField(
+                    decoration: textInputDecoration.copyWith(hintText: 'Description'),
+                    validator: (val) => val.isEmpty ? 'Enter a Description' : null,
+                    onChanged: (val) {
+                      setState(() => description = val);
+                    },
+                  ),
                 ),
-                SizedBox(height: 20.0,),
+                ListTile(
+                  leading: Icon(Icons.details),
+                  title: TextFormField(
+                    decoration: textInputDecoration.copyWith(hintText: 'Course Details'),
+                    validator: (val) => val.isEmpty ? 'Enter a Course Details' : null,
+                    onChanged: (val) {
+                      setState(() => courseDetails = val);
+                    },
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.calendar_today),
+                  title: new Text("CourseDate"),
+                  subtitle: new Text(courseDate.toString()),
+                  onTap: _selectDate,
+                ),
+                SizedBox(height: 5.0),
+                Text("Questions"),
+                ListTile(
+                  title: questions.length > 0 ? Container(
+                    height: 50,
+                    child: ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: questions.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Text(questions[index].description ?? "");
+                        }
+                    ),
+                  ) : Text("Not Added Yet."),
+                  trailing: RaisedButton(
+                    child: Text("Add Question"),
+                    onPressed: (){
+                      createQuestionDialog(context).then((value){
+                        setState(() {
+                          if(value != null) {
+                            questions.add(value);
+                          }
+                        });
+                      });
+                    },
+                  ),
+                ),
+
+                SizedBox(height: 5.0),
                 RaisedButton(
                   color: Colors.blue[400],
                   child: Text(
@@ -155,21 +245,38 @@ class _AddCourseState extends State<AddCourse> {
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
                       setState(() => loading = true);
+                      if( photoUrl != "" && courseDate != null) {
 
-                      teacher.teacherCourses.add(TeacherCourse(courseId: count,students: []));
-                      dynamic res = teacherService.updateTeacher(teacher);
-                      dynamic result = await _dbService.addPost(Course.fromMap({'id': count, 'name': name, 'image': photoUrl, 'teacherId': teacher.uid, 'description': description}));
-                      if (result == null) {
-                        setState(() => {
-                          error = 'Could not sing in with those credentials',
-                          loading = false
+                        teacher.teacherCourses.add(TeacherCourse(courseId: count, students: []));
+                        dynamic res = teacherService.updateTeacher(teacher);
+                        dynamic result = await _dbService.addPost(Course(
+                            id: count,
+                            name: name,
+                            image: photoUrl,
+                            teacherId: teacher.uid,
+                            description: description,
+                            courseDetail: courseDetails,
+                            course_date: courseDate,
+                            questions: questions
+                        ));
+                        if (result == null) {
+                          setState(() =>
+                          {
+                            error = 'Could not sing in with those credentials',
+                            loading = false
+                          });
+                        }
+                        Navigator.pop(context);
+                      } else {
+                        setState(() {
+                          error = 'Fill all maintain fields';
+                          loading = false;
                         });
                       }
-                      Navigator.pop(context);
                     }
                   },
                 ),
-                SizedBox(height: 12.0),
+                SizedBox(height: 10.0),
                 Text(
                   error,
                   style: TextStyle(color: Colors.red, fontSize: 14.0),
@@ -180,6 +287,19 @@ class _AddCourseState extends State<AddCourse> {
       ),
     );
   }
+
+  DateTime courseDate;
+
+  Future _selectDate() async {
+    DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: new DateTime.now(),
+        firstDate: new DateTime(2016),
+        lastDate: new DateTime(2022)
+    );
+    if(picked != null) setState(() => courseDate = picked);
+  }
+
 
   File _image;
   Future chooseFile() async {

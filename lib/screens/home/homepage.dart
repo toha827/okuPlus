@@ -17,20 +17,16 @@ import 'package:provider/provider.dart';
 import 'course/add_course.dart';
 
 class HomePage extends StatefulWidget {
-  String filter;
-  HomePage({this.filter});
   @override
-  _HomePageState createState() => _HomePageState(filter: filter);
+  _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  String filter;
-  _HomePageState({this.filter});
   final AuthService _auth = AuthService();
   final DatabaseService _db = DatabaseService();
   List<String> courses = [];
   List<String> filteredCourses = [];
-  String currUser;
+  String currUser = "";
   bool isTeacher = false;
   bool isSearching = false;
   bool isWelcome = false;
@@ -88,6 +84,10 @@ class _HomePageState extends State<HomePage> {
         });
       });
     });
+
+
+
+    super.initState();
     initializationSettingsAndroid =
     new AndroidInitializationSettings('app_icon');
     initializationSettingsIOS = new IOSInitializationSettings(
@@ -96,10 +96,7 @@ class _HomePageState extends State<HomePage> {
         initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
-
     _showNotification();
-    super.initState();
-
   }
 
   Future onSelectNotification(String payload) async {
@@ -199,13 +196,13 @@ class _HomePageState extends State<HomePage> {
               ///Properties of the App Bar when it is expanded
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
-                title: Text(
+                title: currUser != null ? Text(
                   "Welcome to OkuPlus " + currUser,
                   style: TextStyle(
                     color: Colors.black87,
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,),
-                ),
+                ) : Text("Welcome to OkuPlus"),
                 background: Container(
                   decoration: BoxDecoration(
                     border: Border(
@@ -264,7 +261,7 @@ class _HomePageState extends State<HomePage> {
                 onTap: () async {
                   String uid;
                   await _auth.CurrentUser.listen((event) { uid = event.uid; });
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Home(filter: course)));
                 },
                 title: Text(course)
             )

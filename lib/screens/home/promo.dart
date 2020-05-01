@@ -23,22 +23,32 @@ class _PromoState extends State<Promo>{
   String fullName = '';
   String email = '';
   DateTime birthDate;
-
+  List<User> users = [];
 
   @override
   void initState() {
     _authService.profile.listen((event) {
       setState(() {
         currUser = User.fromMap(event);
-        print(currUser.toMap());
-        print(event.toString());
         birthDate = currUser.birthDate;
+      });
+      studentsCountStream(currUser.subscribers).listen((event) {
+        users = event;
       });
     });
 
     super.initState();
   }
+  Stream<List<User>> studentsCountStream(List<String> list) {
+    return _db.collection('users').where('uid', whereIn: list).snapshots()
+        .map(_coursesListFromSnapshot);
+  }
 
+  List<User> _coursesListFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((doc){
+      return User.fromMap(doc.data);
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,9 +97,28 @@ class _PromoState extends State<Promo>{
                               ClipboardData(text: currUser.uid));
                         }
                       }),
+                ),
+                ListTile(
+                  title: Text("You have collected " + currUser.subscribers.length.toString() + "/10"),
+                  subtitle: Text("To get reward you need to collect at least 10"),
+                ),
+                Container(
+                  height: 100,
+                  child: users.length > 0 ? ListView.builder(
+                      itemCount: users == null ? 0 : users.length,
+                      itemBuilder: (context, index){
+                        return Card(
+                          child: Column(
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text(users[index].displayName),
+                                ),
+                              ]
+                          ),
+                        );
+                      }) : Text("You don't have any subscribes")
                 )
-              ],
-            ),
+            ]),
           ),
 
         ],

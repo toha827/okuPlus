@@ -46,7 +46,7 @@ class _CourseListState extends State<CourseList> {
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => CourseDetail(courses[index], uid)));
                       },
-                      title: Text(courses[index].tag),
+                      title: Text(courses[index].name),
                     ),
                   ]
               ),

@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/TeacherCourse.dart';
+import 'package:flutterapp/models/TeacherRequest.dart';
 import 'package:flutterapp/models/course.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/home/main_drawer.dart';
@@ -10,24 +11,25 @@ import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/database.dart';
 import 'package:flutterapp/services/teacher_service.dart';
 
-class StudentsList extends StatefulWidget {
+class RequestsList extends StatefulWidget {
 
-  List<TeacherCourse> courses;
+  List<TeacherRequest> requests;
 
-  StudentsList({this.courses});
+  RequestsList({this.requests});
 
   @override
-  _StudentsListState createState() => _StudentsListState(courses: courses);
+  _RequestsListState createState() => _RequestsListState(requests: requests);
 }
 
-class _StudentsListState extends State<StudentsList> {
+class _RequestsListState extends State<RequestsList> {
 
   final Firestore _db = Firestore.instance;
   DatabaseService _databaseService = DatabaseService();
   AuthService _authService = AuthService();
   TeacherService _teacherService;
 
-  List<TeacherCourse> courses;
+  List<TeacherRequest> requests;
+  Teacher currTeacher;
   List<Course> coursesName = [];
   List<List<User>> students = [];
   List<String> studentsUID = [];
@@ -35,16 +37,19 @@ class _StudentsListState extends State<StudentsList> {
   String uid;
   bool isExpand = false;
 
-  _StudentsListState({this.courses});
+  _RequestsListState({this.requests});
 
   @override
   void initState() {
     _authService.CurrentUser.listen((event) {
       uid = event.uid;
       _teacherService = TeacherService(uid: uid);
+      _teacherService.getTeacher().listen((event) {
+        currTeacher = event;
+      });
     });
     _databaseService.courses.listen((event) {
-      courses.forEach((element) {
+      requests.forEach((element) {
         event.forEach((element1) {
           if (element.courseId == element1.id){
            setState(() {
@@ -54,11 +59,9 @@ class _StudentsListState extends State<StudentsList> {
         });
       });
     });
-    courses.forEach((element) {
+    requests.forEach((element) {
       studentsUID = [];
-      element.students.forEach((element1) {
-        studentsUID.add(element1);
-      });
+      studentsUID.add(element.studentId);
       studentsCountStream(studentsUID).listen((event) {
         students.add(event);
       });
@@ -92,55 +95,35 @@ class _StudentsListState extends State<StudentsList> {
       body: ListView.builder(
         itemBuilder: (context, position) {
         return Card(
-        child: listItem(coursesName[position].name, students[position], position),
+        child: listItem(coursesName[position].name + " " + students[position][0].displayName, students[position], position),
         );
         },
-        itemCount: courses.length,
+        itemCount: requests.length,
         ));
   }
     Widget listItem(String title, List<User> list, int position) => Container(
     height: 300.0,
     color: Colors.white,
-    child: ExpansionTile(
-        key: PageStorageKey(this.widget.key),
-        title: Container(
+    child: Container(
             width: double.infinity,
 
-            child: Text(title,style: TextStyle(fontSize: 18))
-        ),
-            trailing: Icon(Icons.arrow_drop_down,size: 32,color: Colors.pink,),
-            onExpansionChanged: (value){
-              setState(() {
-                isExpand=value;
-              });
-            },
-            children: getStudents(list,position)
-        )
+            child: ListTile(
+              title: Text(title,style: TextStyle(fontSize: 18)),
+              trailing: ButtonTheme(
+                  buttonColor: !requests[position].submitted ? Colors.green : Colors.red,
+                  minWidth: 50.0,
+                  height: 20.0,
+                  child: RaisedButton(
+                      child: !requests[position].submitted ? Icon(Icons.add) : Icon(Icons.cancel),
+                      onPressed: () async {
+                        setState(() {
+                          requests[position].submitted = !requests[position].submitted;
+                          currTeacher.teacherRequests = requests;
+                        });
+                        await _teacherService.updateTeacher(currTeacher);
+                      })
+              ),
+            )
+    ),
   );
-
-  List<Widget> getStudents(List<User> list,int position) {
-    List<Widget> ll = [];
-    for(int i = 0; i < list.length; i++){
-      ll.add(
-        ListTile(
-          title: Text(list[i].displayName,style: TextStyle(fontSize: 18)),
-          trailing: ButtonTheme(
-            buttonColor: !courses[position].confirmed[i] ? Colors.green : Colors.red,
-            minWidth: 50.0,
-            height: 20.0,
-            child: RaisedButton(
-                child: Icon(Icons.add),
-                onPressed: () async {
-                  setState(() {
-                    courses[position].confirmed[i] = !courses[position].confirmed[i];
-                  });
-                  Teacher updateTeacher = new Teacher(uid: uid,teacherCourses: courses);
-                  await _teacherService.updateTeacher(updateTeacher);
-                })
-        ),
-        )
-      );
-    }
-    return ll;
-  }
 }

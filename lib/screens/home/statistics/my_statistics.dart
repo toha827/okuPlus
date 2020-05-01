@@ -7,6 +7,7 @@ import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/top.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/home/main_drawer.dart';
+import 'package:flutterapp/screens/home/statistics/requests_list.dart';
 import 'file:///C:/okuPlus-master/okuPlus-master/lib/screens/home/statistics/students_list.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/teacher_service.dart';
@@ -29,12 +30,18 @@ class _MyStatisticsState extends State<MyStatistics> {
   List<String> myStudents = [];
   double balance = 0.0;
   List<Top> topList = [];
-  var data = [0.0,1.2];
+  var data = [0.0];
   var data1 = [12000.0,24000.0,30000.0,50000.0];
+  bool isAdmin = false;
 
   int studentsCount = 0;
+  int requestsCount = 0;
+
   @override
   void initState() {
+    _auth.isAdmin.listen((event) {
+      isAdmin = event;
+    });
     _auth.CurrentUser.listen((event) {
       setState(() {
         _teacherService = TeacherService(uid: event.uid);
@@ -49,8 +56,12 @@ class _MyStatisticsState extends State<MyStatistics> {
       _teacherService.getTeacher().listen((event1) {
         setState(() {
           currTeacher = event1;
+          requestsCount = event1.teacherRequests.length;
         });
         currTeacher.teacherCourses.forEach((element) {
+          data = [0.0];
+          balance = 0;
+          myStudents = [];
           double sum = 0.0;
           for(int i = 0; i < element.students.length; i++) {
             sum += 50000.0;
@@ -377,14 +388,22 @@ class _MyStatisticsState extends State<MyStatistics> {
               padding: const EdgeInsets.all(8.0),
               child: myCircularItems("Quarterly Profits","68.7M"),
             ),
-            StreamBuilder<List<User>>(
+            isAdmin ? StreamBuilder<List<User>>(
                 stream: teacherCountStream(),
                 builder: (context, snapshot) {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: myTextItems("Teachers", snapshot.data.length.toString()),
                   );
-                }),
+                }) :
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => RequestsList(requests: currTeacher.teacherRequests)));
+                },child: myTextItems("Requests", requestsCount.toString()),
+              )
+            ),
             StreamBuilder<List<User>>(
             stream: studentsCountStream(),
             builder: (context, snapshot) {
@@ -416,7 +435,6 @@ class _MyStatisticsState extends State<MyStatistics> {
             StaggeredTile.extent(2, 250.0),
             StaggeredTile.extent(2, 120.0),
             StaggeredTile.extent(2, 120.0),
-            StaggeredTile.extent(4, 250.0),
             StaggeredTile.extent(4, 250.0),
           ],
         ),
