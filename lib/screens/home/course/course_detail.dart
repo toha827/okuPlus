@@ -54,8 +54,10 @@ class _CourseDetailState extends State<CourseDetail> {
         _myCoursesService = MyCoursesService(event.uid);
         _teacherService = TeacherService(uid: course.teacherId);
       });
-      _auth.profile.listen((event) {
-        isStudent = User.fromMap(event).userType == "Student";
+      _auth.isStudent.listen((event) {
+        setState(() {
+          isStudent = event;
+        });
       });
       _db.collection('users').document(uid).snapshots().listen((event) {
         setState(() {

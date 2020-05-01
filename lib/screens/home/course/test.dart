@@ -127,7 +127,7 @@ class _TestState extends State<Test> {
 //            timeInSecForIosWeb: 1,
 //          );
           if (score == questinos.length){
-            Top newTop = new Top(name: top.name, score: top.score + 50);
+            Top newTop = new Top(name: top.name, score: top == null ? 0 : top.score + 50);
             topService.updateTop(newTop);
           }
         },

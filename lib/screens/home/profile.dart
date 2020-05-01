@@ -19,7 +19,6 @@ class _ProfileState extends State<Profile>{
   String fullName = '';
   String email = '';
   DateTime birthDate;
-
   List _userTypes =  ["Teacher", "Student"];
   List _userState =  ["School student", "University student", "Employed", "Non-employed"];
   List _userInterests =  ["Science and Mathematics", "Humanities and Arts", "Engineering and I.T."];
@@ -207,9 +206,9 @@ class _ProfileState extends State<Profile>{
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
                                       new Flexible(
-                                        child: _status && currUser.fullName != null ?
+                                        child: _status && currUser.displayName != null ?
                                         new ListTile(
-                                          title: new Text(currUser.fullName),
+                                          title: new Text(currUser.displayName),
                                         ) :
                                         new TextField(
                                           decoration: const InputDecoration(
@@ -217,7 +216,7 @@ class _ProfileState extends State<Profile>{
                                           ),
                                           enabled: !_status,
                                           autofocus: !_status,
-                                          onChanged: (val) => currUser.fullName = val,
+                                          onChanged: (val) => currUser.displayName = val,
                                         ),
                                       ),
                                     ],

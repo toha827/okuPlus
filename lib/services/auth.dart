@@ -25,12 +25,15 @@ class AuthService {
   Observable<FirebaseUser> CurrentUser;
   BehaviorSubject<bool> isTeacher;
   BehaviorSubject<bool> isAdmin;
+  BehaviorSubject<bool> isStudent;
 
   AuthService(){
     isTeacher = BehaviorSubject<bool>();
     isAdmin = BehaviorSubject<bool>();
+    isStudent = BehaviorSubject<bool>();
     isTeacher.add(false);
     isAdmin.add(false);
+    isStudent.add(false);
     CurrentUser = Observable(_auth.onAuthStateChanged);
 
     profile = CurrentUser.switchMap((FirebaseUser u) {
@@ -43,6 +46,7 @@ class AuthService {
     profile.listen((event) {
       isTeacher.add(User.fromMap(event).userType == "Teacher");
       isAdmin.add(User.fromMap(event).userType == "Admin");
+      isStudent.add(User.fromMap(event).userType == "Student");
     });
   }
 
