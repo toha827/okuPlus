@@ -5,6 +5,7 @@ import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/TeacherCourse.dart';
 import 'package:flutterapp/models/TeacherRequest.dart';
 import 'package:flutterapp/models/course.dart';
+import 'package:flutterapp/models/schedule.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/home/main_drawer.dart';
 import 'package:flutterapp/services/auth.dart';
@@ -29,7 +30,9 @@ class _RequestsListState extends State<RequestsList> {
   TeacherService _teacherService;
 
   List<TeacherRequest> requests;
+  List<TeacherRequest>  filteredRequests = [];
   Teacher currTeacher;
+  User currentTeacher;
   List<Course> coursesName = [];
   List<List<User>> students = [];
   List<String> studentsUID = [];
@@ -42,10 +45,17 @@ class _RequestsListState extends State<RequestsList> {
   @override
   void initState() {
     _authService.CurrentUser.listen((event) {
-      uid = event.uid;
-      _teacherService = TeacherService(uid: uid);
+      setState(() {
+        uid = event.uid;
+        _teacherService = TeacherService(uid: uid);
+      });
       _teacherService.getTeacher().listen((event) {
         currTeacher = event;
+      });
+      _db.collection('users').document(uid).snapshots().listen((event) {
+        setState(() {
+          currentTeacher = User.fromMap(event.data);
+        });
       });
     });
     _databaseService.courses.listen((event) {
@@ -104,17 +114,19 @@ class _RequestsListState extends State<RequestsList> {
     Widget listItem(String title, List<User> list, int position) => Container(
     height: 300.0,
     color: Colors.white,
-    child: Container(
-            width: double.infinity,
-
-            child: ListTile(
+    child: Visibility(
+      visible: true,
+      child: Column(
+          children: <Widget>[
+            ListTile(
               title: Text(title,style: TextStyle(fontSize: 18)),
-              trailing: ButtonTheme(
-                  buttonColor: !requests[position].submitted ? Colors.green : Colors.red,
+              subtitle:
+              ButtonTheme(
+                  buttonColor: Colors.redAccent,
                   minWidth: 50.0,
                   height: 20.0,
                   child: RaisedButton(
-                      child: !requests[position].submitted ? Icon(Icons.add) : Icon(Icons.cancel),
+                      child: Icon(Icons.cancel),
                       onPressed: () async {
                         setState(() {
                           requests[position].submitted = !requests[position].submitted;
@@ -123,7 +135,33 @@ class _RequestsListState extends State<RequestsList> {
                         await _teacherService.updateTeacher(currTeacher);
                       })
               ),
-            )
-    ),
+              trailing: ButtonTheme(
+                  buttonColor: Colors.green,
+                  minWidth: 50.0,
+                  height: 20.0,
+                  child: RaisedButton(
+                      child: Icon(Icons.add),
+                      onPressed: () async {
+                        setState(() {
+                          requests[position].submitted = !requests[position].submitted;
+                          currTeacher.teacherRequests = requests;
+                        });
+                        await _teacherService.updateTeacher(currTeacher);
+                        User student;
+                        _db.collection('users').document(requests[position].studentId).snapshots().listen((event) {
+                          setState(() {
+                            student = User.fromMap(event.data);
+                            student.schedule.add(Schedule(name: coursesName[position].name, desc: "Lesson with Teacher", complete_date: requests[position].timestamp, pos: student.schedule.length, complete: false));
+                            currentTeacher.schedule.add(Schedule(name: coursesName[position].name, desc: "Lesson with Student" + student.displayName, complete_date: requests[position].timestamp, pos: student.schedule.length, complete: false));
+                          });
+                          _authService.updateUserrData(student.uid, student);
+                          _authService.updateUserrData(currentTeacher.uid, currentTeacher);
+                        });
+                      })
+              )
+
+    )
+]
+))
   );
 }

@@ -49,7 +49,7 @@ class _TaskDetailState extends State<TaskDetail>{
           _user = User.fromMap(event.data);
           _user.schedule[_task.pos] = _task;
         });
-        _authService.updateUserData(_user.uid, _user);
+        _authService.updateUserrData(_user.uid, _user);
       });
     });
   }

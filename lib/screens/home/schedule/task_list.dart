@@ -94,10 +94,10 @@ class _TaskListState extends State<TaskList>{
           _currentList.add(task);
           setState(() {
             _currentUser.schedule = _taskList;
-            _authService.updateUserData(_currentUser.uid, _currentUser);
+            _authService.updateUserrData(_currentUser.uid, _currentUser);
           });
         } else {
-          updateCurrentTaskJson(task);
+          updateCurrentTaskJson(task) ;
         }
       }
   }

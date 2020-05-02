@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/TeacherCourse.dart';
@@ -36,6 +39,8 @@ class _AddCourseState extends State<AddCourse> {
   String image = '';
   String description = '';
   String courseDetails = '';
+  String promoLink = '';
+  File additionalFile;
   int count;
   String error = '';
   List<Question> questions = [];
@@ -136,6 +141,43 @@ class _AddCourseState extends State<AddCourse> {
     });
   }
 
+  Future<void> _uploadImageToFirebase(File image) async {
+    try {
+      // Make random image name.
+      int randomNumber = Random().nextInt(100000);
+      String imageLocation = 'trash/${randomNumber}' + image.path.split('/').last;
+
+      // Upload image to firebase.
+      final StorageReference storageReference = FirebaseStorage().ref().child(imageLocation);
+      final StorageUploadTask uploadTask = storageReference.putFile(image);
+      await uploadTask.onComplete;
+      _addPathToDatabase(imageLocation);
+    }catch(e){
+      print(e.message);
+    }
+  }
+  String FileUrl;
+  Future<void> _addPathToDatabase(String text) async {
+    try {
+      // Get image URL from firebase
+      final ref = FirebaseStorage().ref().child(text);
+      var imageString = await ref.getDownloadURL();
+      setState(() {
+        FileUrl = imageString;
+      });
+    }catch(e){
+      print(e.message);
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text(e.message),
+            );
+          }
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return loading ?  Loading() : Scaffold(
@@ -148,7 +190,7 @@ class _AddCourseState extends State<AddCourse> {
         ],
       ),
       body: Container(
-          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 0.0),
+          padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -170,7 +212,6 @@ class _AddCourseState extends State<AddCourse> {
                     ),
                   ),
                 ),
-                SizedBox(height: 5.0),
                 ListTile(
                   leading: Icon(Icons.filter_none),
                   title: TextFormField(
@@ -181,7 +222,6 @@ class _AddCourseState extends State<AddCourse> {
                     },
                   ),
                 ),
-                SizedBox(height: 5.0),
                 ListTile(
                   leading: Icon(Icons.description),
                   title: TextFormField(
@@ -208,11 +248,10 @@ class _AddCourseState extends State<AddCourse> {
                   subtitle: new Text(courseDate.toString()),
                   onTap: _selectDate,
                 ),
-                SizedBox(height: 5.0),
                 Text("Questions"),
                 ListTile(
                   title: questions.length > 0 ? Container(
-                    height: 50,
+                    height: 40,
                     child: ListView.builder(
                         padding: const EdgeInsets.all(8),
                         itemCount: questions.length,
@@ -234,8 +273,26 @@ class _AddCourseState extends State<AddCourse> {
                     },
                   ),
                 ),
-
-                SizedBox(height: 5.0),
+                ListTile(
+                  title: Text("Additional Files"),
+                  trailing: RaisedButton(
+                    child: Text("Add File"),
+                    onPressed: () async {
+                      File file = await FilePicker.getFile();
+                      await _uploadImageToFirebase(file);
+                    },
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.videocam),
+                  title: TextFormField(
+                    decoration: textInputDecoration.copyWith(hintText: 'Video Link'),
+                    validator: (val) => val.isEmpty ? 'Enter a Video Link' : null,
+                    onChanged: (val) {
+                      setState(() => promoLink = val);
+                    },
+                  ),
+                ),
                 RaisedButton(
                   color: Colors.blue[400],
                   child: Text(
@@ -257,7 +314,8 @@ class _AddCourseState extends State<AddCourse> {
                             description: description,
                             courseDetail: courseDetails,
                             course_date: courseDate,
-                            questions: questions
+                            questions: questions,
+                            fileUrl: FileUrl
                         ));
                         if (result == null) {
                           setState(() =>
@@ -276,7 +334,6 @@ class _AddCourseState extends State<AddCourse> {
                     }
                   },
                 ),
-                SizedBox(height: 10.0),
                 Text(
                   error,
                   style: TextStyle(color: Colors.red, fontSize: 14.0),

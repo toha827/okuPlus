@@ -235,14 +235,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      floatingActionButton:  Visibility(
-              visible: true,
-              child: FloatingActionButton(
-                onPressed: _showNotification,
-                child: Icon(Icons.add, color: Colors.white,),
-                foregroundColor: Colors.blue,
-              ),
-            )
     );
   }
 

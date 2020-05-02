@@ -50,6 +50,8 @@ dependencies:
   flutter_full_pdf_viewer: ^1.0.6
   path_provider: ^1.5.1
   rxdart: 0.20.0
+  file_picker: ^1.9.0
+  flutter_downloader: ^1.4.4
 
 dev_dependencies:
   flutter_test:

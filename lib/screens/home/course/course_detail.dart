@@ -1,8 +1,13 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutterapp/models/Teacher.dart';
 import 'package:flutterapp/models/TeacherCourse.dart';
 import 'package:flutterapp/models/TeacherRequest.dart';
@@ -19,6 +24,9 @@ import 'package:flutterapp/shared/cardDetatil.dart';
 import 'package:flutterapp/shared/common.dart';
 import 'package:flutterapp/shared/loading.dart';
 import 'package:flutterapp/shared/textStyle.dart';
+import 'package:path_provider/path_provider.dart';
+
+import '../../../main.dart';
 
 
 class CourseDetail extends StatefulWidget {
@@ -40,6 +48,9 @@ class _CourseDetailState extends State<CourseDetail> {
   bool isBought = false;
   bool isStudent = false;
   List<Course> list = [];
+  bool _isLoading;
+  bool _permissionReady;
+  String _localPath;
 
   bool isExpand = false;
   _CourseDetailState(this.course, this.uid);
@@ -83,7 +94,10 @@ class _CourseDetailState extends State<CourseDetail> {
     });
 
     super.initState();
+    FlutterDownloader.registerCallback(downloadCallback);
+
   }
+  ReceivePort _port = ReceivePort();
 
   @override
   Widget build(BuildContext context) {
@@ -200,6 +214,21 @@ class _CourseDetailState extends State<CourseDetail> {
                   leading: Text("Lessons"),
                 ),
                 ListTile(
+                  title: Text("Additional Files"),
+                  trailing: RaisedButton(
+                    child: Icon(Icons.arrow_downward),
+                    onPressed: () async {
+                      //_downloadFile(course.fileUrl, course.name);
+                      final taskId = await FlutterDownloader.enqueue(
+                        url: course.fileUrl,
+                        savedDir: (await getApplicationDocumentsDirectory()).path,
+                        showNotification: true, // show download progress in status bar (for Android)
+                        openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+                      );
+                    },
+                  ),
+                ),
+                ListTile(
                   leading: Icon(Icons.video_library),
                   title: Text("Promo Video"),
                   onTap: () => {
@@ -263,6 +292,28 @@ class _CourseDetailState extends State<CourseDetail> {
 
   }
 
+  static var httpClient = new HttpClient();
+  Future<File> _downloadFile(String url, String filename) async {
+    var request = await httpClient.getUrl(Uri.parse(url));
+    var response = await request.close();
+    var bytes = await consolidateHttpClientResponseBytes(response);
+    String dir = (await getDownloadsDirectory()).path;
+    File file = new File('$dir/$filename');
+    await file.writeAsBytes(bytes);
+    return file;
+  }
+
+  static void downloadCallback(
+      String id, DownloadTaskStatus status, int progress) {
+    if (debug) {
+      print(
+          'Background Isolate Callback: task ($id) is in status ($status) and process ($progress)');
+    }
+    final SendPort send =
+    IsolateNameServer.lookupPortByName('downloader_send_port');
+    send.send([id, status, progress]);
+  }
+
   DateTime requestDate;
 
   Future _selectDate() async {
@@ -279,10 +330,12 @@ class _CourseDetailState extends State<CourseDetail> {
   final IconData unfilledStar = Icons.star_border;
 
   void onChanged (int index) {
-    setState(() {
-      _teacher.rating = ((_teacher.rating + index)/2).toInt();
-      _teacherService.updateTeacher(_teacher);
-    });
+    if( isStudent ) {
+      setState(() {
+        _teacher.rating = ((_teacher.rating + index) / 2).toInt();
+        _teacherService.updateTeacher(_teacher);
+      });
+    }
   }
 
   Container _getToolbar(BuildContext context) {
@@ -295,44 +348,5 @@ class _CourseDetailState extends State<CourseDetail> {
                 child: new BackButton(color: Colors.white),
               );
       }
-//    return StreamBuilder<String>(
-//        stream: _auth.CurrentUser.map((event) => event.uid),
-//        builder: (context, snapshot) {
-//          return Scaffold(
-//            appBar: AppBar(
-//              title: Text("Second Route"),
-//            ),
-//            body: Column(
-//                children: <Widget>[
-//            Image(
-//            image: NetworkImage(course.image),
-//            fit: BoxFit.fill,
-//            height: 200,
-//          ),
-//          SizedBox(height: 10.0),
-//          Text(
-//          course.name,
-//          style: TextStyle(fontSize: 20.0)
-//          ),
-//          SizedBox(height: 10.0),
-//          Text(course.description),
-//          new Visibility(
-//                  visible: !isBought,
-//                  child: RaisedButton(
-//                      color: Colors.blue[400],
-//                      child: Text(
-//                        'Add Course',
-//                        style: TextStyle(color: Colors.white),
-//                      ),
-//                      onPressed: () {
-//                        list.add(course);
-//                        _myCoursesService.updateUserData(MyCourse(myCourses: list));
-//                      }
-//                  )
-//          )
-//        ],
-//      ),
-//    );
-//  });
-//  }
+
 }

@@ -3,9 +3,16 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutterapp/models/Teacher.dart';
+import 'package:flutterapp/models/course.dart';
+import 'package:flutterapp/models/myCourse.dart';
+import 'package:flutterapp/models/schedule.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/wrapper.dart';
 import 'package:flutterapp/services/auth.dart';
+import 'package:flutterapp/services/database.dart';
+import 'package:flutterapp/services/myCourses.dart';
+import 'package:flutterapp/services/teacher_service.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Promo extends StatefulWidget {
@@ -18,12 +25,19 @@ class _PromoState extends State<Promo>{
   AuthService _authService = new AuthService();
   final Firestore _db = Firestore.instance;
 
+  MyCoursesService _myCoursesService;
+  TeacherService _teacherService;
+  final DatabaseService _databaseService = DatabaseService();
+
   User currUser;
   String promo = '';
   String fullName = '';
   String email = '';
   DateTime birthDate;
   List<User> users = [];
+  List<String> subscribers = [];
+  List<Course> list = [];
+  List<Course> courses = [];
 
   @override
   void initState() {
@@ -31,14 +45,106 @@ class _PromoState extends State<Promo>{
       setState(() {
         currUser = User.fromMap(event);
         birthDate = currUser.birthDate;
+        _myCoursesService = MyCoursesService(currUser.uid);
+        subscribers = currUser.subscribers;
       });
-      studentsCountStream(currUser.subscribers).listen((event) {
+
+      _myCoursesService.courses.listen((event) {
+        setState(() {
+
+        });
+        list = event ?? new List<Course>();
+        _databaseService.courses.listen((event1) {
+          event1.forEach((element1) {
+            bool isHave = false;
+            list.forEach((element2) {
+              if (element1.id == element2.id) {
+                isHave = true;
+              }
+            });
+            if ( !isHave ) {
+              setState(() {
+                courses.add(element1);
+              });
+            }
+          });
+          int count = 0;
+          subscribers.forEach((element) {
+            count++;
+            if (count == 2){
+              AddCourseFromPromo(courses[0], courses[0].teacherId);
+              setState(() {
+                subscribers.removeRange(0, count - 1);
+                currUser.subscribers = subscribers;
+                createQuestionDialog(context,courses[0].name);
+                courses.removeAt(0);
+                count = 0;
+              });
+              StudentsList();
+            }
+          });
+        });
+      });
+
+      StudentsList();
+
+    });
+    super.initState();
+  }
+
+  void StudentsList() {
+    studentsCountStream(currUser.subscribers).listen((event) {
+      setState(() {
         users = event;
       });
     });
-
-    super.initState();
   }
+
+  Future createQuestionDialog(BuildContext context, String courseName){
+    return showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text("You get new Course " + courseName),
+        content: Column(
+            children: <Widget>[
+            ]
+        ),
+        actions: <Widget>[
+          MaterialButton(
+            elevation: 3.0,
+            child: Text("Ok"),
+            onPressed: (){
+              Navigator.pop(context);
+            },
+          )
+        ],
+      );
+    });
+  }
+
+
+  AddCourseFromPromo(Course course, String teacherUid) {
+    currUser.schedule.add(new Schedule(name: course.name, desc: "Lesson", complete: false, complete_date: course.course_date));
+    _authService.updateUserrData(currUser.uid, currUser);
+    list.add(course);
+    Teacher _teacher;
+    _teacherService = TeacherService(uid: teacherUid);
+    _teacherService.getTeacher().listen((event) {
+      setState(() {
+        _teacher = event;
+        _teacher.teacherCourses.forEach((element) {
+          if( element.courseId == course.id) {
+            element.students.add(currUser.uid);
+            element.timestamp.add(DateTime.now());
+            element.confirmed.add(false);
+          }
+        });
+      });
+      _teacherService.updateTeacher(_teacher);
+      _myCoursesService.updateUserData(MyCourse(myCourses: list));
+    });
+
+  }
+
   Stream<List<User>> studentsCountStream(List<String> list) {
     return _db.collection('users').where('uid', whereIn: list).snapshots()
         .map(_coursesListFromSnapshot);
@@ -82,7 +188,7 @@ class _PromoState extends State<Promo>{
                             user = event;
                             if (!event.subscribers.contains(currUser.uid) ) {
                               user.subscribers.add(currUser.uid);
-                              _authService.updateUserData(promo, user);
+                              _authService.updateUserrData(promo, user);
                             }
                           });
                       }),

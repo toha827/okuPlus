@@ -197,6 +197,12 @@ class AuthService {
     );
   }
 
+  Future<void> updateUserrData(String uid, User user) async {
+    return await _db.collection('users').document(uid).setData(
+        user.toMap()
+    );
+  }
+
   Future<StorageReference> uploadFile(File _image) async {
     StorageReference storageReference = FirebaseStorage.instance
         .ref()
