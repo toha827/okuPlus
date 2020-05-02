@@ -41,9 +41,9 @@ class _PromoState extends State<Promo>{
 
   @override
   void initState() {
-    _authService.profile.listen((event) {
+    _authService.profile.listen((event2) {
       setState(() {
-        currUser = User.fromMap(event);
+        currUser = User.fromMap(event2);
         birthDate = currUser.birthDate;
         _myCoursesService = MyCoursesService(currUser.uid);
         subscribers = currUser.subscribers;
@@ -53,7 +53,7 @@ class _PromoState extends State<Promo>{
         setState(() {
 
         });
-        list = event ?? new List<Course>();
+        list = event ?? [];
         _databaseService.courses.listen((event1) {
           event1.forEach((element1) {
             bool isHave = false;

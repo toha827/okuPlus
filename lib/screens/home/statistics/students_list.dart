@@ -92,7 +92,7 @@ class _StudentsListState extends State<StudentsList> {
       body: ListView.builder(
         itemBuilder: (context, position) {
         return Card(
-        child: listItem(coursesName[position].name, students[position], position),
+        child: listItem(coursesName[position] == null ? "" : "dd", students[position] ?? null, position),
         );
         },
         itemCount: courses.length,
@@ -101,7 +101,7 @@ class _StudentsListState extends State<StudentsList> {
     Widget listItem(String title, List<User> list, int position) => Container(
     height: 300.0,
     color: Colors.white,
-    child: ExpansionTile(
+    child: list != null ? ExpansionTile(
         key: PageStorageKey(this.widget.key),
         title: Container(
             width: double.infinity,
@@ -115,7 +115,7 @@ class _StudentsListState extends State<StudentsList> {
               });
             },
             children: getStudents(list,position)
-        )
+        ) : Text("No Students")
   );
 
   List<Widget> getStudents(List<User> list,int position) {
@@ -124,20 +124,20 @@ class _StudentsListState extends State<StudentsList> {
       ll.add(
         ListTile(
           title: Text(list[i].displayName,style: TextStyle(fontSize: 18)),
-          trailing: ButtonTheme(
-            buttonColor: !courses[position].confirmed[i] ? Colors.green : Colors.red,
-            minWidth: 50.0,
-            height: 20.0,
-            child: RaisedButton(
-                child: Icon(Icons.add),
-                onPressed: () async {
-                  setState(() {
-                    courses[position].confirmed[i] = !courses[position].confirmed[i];
-                  });
-                  Teacher updateTeacher = new Teacher(uid: uid,teacherCourses: courses);
-                  await _teacherService.updateTeacher(updateTeacher);
-                })
-        ),
+//          trailing: ButtonTheme(
+//            buttonColor: !courses[position].confirmed[i] ? Colors.green : Colors.red,
+//            minWidth: 50.0,
+//            height: 20.0,
+//            child: RaisedButton(
+//                child: Icon(Icons.add),
+//                onPressed: () async {
+//                  setState(() {
+//                    courses[position].confirmed[i] = !courses[position].confirmed[i];
+//                  });
+//                  Teacher updateTeacher = new Teacher(uid: uid,teacherCourses: courses);
+//                  await _teacherService.updateTeacher(updateTeacher);
+//                })
+//        ),
         )
       );
     }

@@ -43,163 +43,167 @@ class _MainDrawerState extends State<MainDrawer>{
   @override
   Widget build(BuildContext context) {
     return Drawer(
-        child: Column(
+        child: ListView(
           children: <Widget>[
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(20),
-              color: Theme.of(context).primaryColor,
-              child: Center(
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      width: 100,
-                      height: 100,
-                      margin: EdgeInsets.only(
-                          top: 30,
-                          bottom: 10
-                      ),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            image: currentUser.photoURL == "" ? AssetImage('profile.png') : NetworkImage(currentUser.photoURL),
-                            fit: BoxFit.fill),
+            Column(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(5),
+                  color: Theme.of(context).primaryColor,
+                  child: Center(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          width: 100,
+                          height: 100,
+                          margin: EdgeInsets.only(
+                              top: 30,
+                              bottom: 10
+                          ),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: currentUser.photoURL == "" ? AssetImage('profile.png') : NetworkImage(currentUser.photoURL),
+                                fit: BoxFit.fill),
+                          ),
+                        ),
+                        Text(
+                            currentUser.displayName,
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: Colors.white,
+                            )
+                        ),
+                        Text(
+                            currentUser.email,
+                            style: TextStyle(
+                              color: Colors.white,
+                            )
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text(
+                    'Profile',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.card_giftcard),
+                  title: Text(
+                    'Promo',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Promo()));
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.calendar_today),
+                  title: Text(
+                    'Schedule',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => MySchedule()));
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.view_list),
+                  title: Text(
+                    'Courses',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                  },
+                ),
+                new Visibility(
+                  visible: currentUser.userType == 'Student',
+                  child: ListTile(
+                    leading: Icon(Icons.personal_video),
+                    title: Text(
+                      'My Courses',
+                      style: TextStyle(
+                        fontSize: 18,
                       ),
                     ),
-                    Text(
-                        currentUser.displayName,
-                        style: TextStyle(
-                          fontSize: 22,
-                          color: Colors.white,
-                        )
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => MyCoursesView()));
+                    },
+                  ),
+                ),
+                new Visibility(
+                  visible: currentUser.userType == 'Teacher' || currentUser.userType == 'Admin',
+                  child: ListTile(
+                    leading: Icon(Icons.graphic_eq),
+                    title: Text(
+                      'My Statistics',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
                     ),
-                    Text(
-                        currentUser.email,
-                        style: TextStyle(
-                          color: Colors.white,
-                        )
-                    )
-                  ],
-                ),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text(
-                'Profile',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.card_giftcard),
-              title: Text(
-                'Promo',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Promo()));
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.calendar_today),
-              title: Text(
-                'Schedule',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => MySchedule()));
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.view_list),
-              title: Text(
-                'Courses',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
-              },
-            ),
-            new Visibility(
-              visible: currentUser.userType == 'Student',
-              child: ListTile(
-                leading: Icon(Icons.personal_video),
-                title: Text(
-                  'My Courses',
-                  style: TextStyle(
-                    fontSize: 18,
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => MyStatistics()));
+                    },
                   ),
                 ),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => MyCoursesView()));
-                },
-              ),
-            ),
-            new Visibility(
-              visible: currentUser.userType == 'Teacher' || currentUser.userType == 'Admin',
-              child: ListTile(
-                leading: Icon(Icons.graphic_eq),
-                title: Text(
-                  'My Statistics',
-                  style: TextStyle(
-                    fontSize: 18,
+                new Visibility(
+                  visible: currentUser.userType == 'Teacher',
+                  child: ListTile(
+                    leading: Icon(Icons.short_text),
+                    title: Text(
+                      'My Teaching Courses',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => MyTeachingCourses()));
+                    },
                   ),
                 ),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => MyStatistics()));
-                },
-              ),
-            ),
-            new Visibility(
-              visible: currentUser.userType == 'Teacher',
-              child: ListTile(
-                leading: Icon(Icons.short_text),
-                title: Text(
-                  'My Teaching Courses',
-                  style: TextStyle(
-                    fontSize: 18,
+                ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text(
+                    'Settings',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
                   ),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
+                  },
                 ),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => MyTeachingCourses()));
-                },
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text(
-                'Settings',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.arrow_back),
-              title: Text(
-                'Logout',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              onTap: () async {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Wrapper()));
-                await authService.signOut();
-              },
+                ListTile(
+                  leading: Icon(Icons.arrow_back),
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Wrapper()));
+                    await authService.signOut();
+                  },
+                )
+              ],
             )
           ],
         )
