@@ -74,11 +74,11 @@ class _PromoState extends State<Promo>{
             if (count == 2){
               AddCourseFromPromo(courses[0], courses[0].teacherId);
               setState(() {
-                subscribers.removeRange(0, count - 1);
+                subscribers.removeRange(0, count);
+                count = 0;
                 currUser.subscribers = subscribers;
                 createQuestionDialog(context,courses[0].name);
                 courses.removeAt(0);
-                count = 0;
               });
               StudentsList();
             }
