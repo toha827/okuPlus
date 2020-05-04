@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterapp/models/course.dart';
 import 'dart:io';
 import 'package:flutterapp/models/top.dart';
@@ -13,6 +15,7 @@ import 'package:flutterapp/models/question.dart';
 import 'package:flutterapp/screens/home/course/course_detail.dart';
 import 'package:flutterapp/shared/pdf/pdf.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class Test extends StatefulWidget {
@@ -36,7 +39,7 @@ class _TestState extends State<Test> {
   Top top;
   TopService topService;
   bool isExpand = true;
-
+  Directory _downloadsDirectory;
 
   @override
   void initState() {
@@ -59,6 +62,8 @@ class _TestState extends State<Test> {
     });
 
     super.initState();
+    initDownloadsDirectoryState();
+
   }
 
   Future<Question> createQuestionDialog(BuildContext context, int score, int full){
@@ -119,14 +124,14 @@ class _TestState extends State<Test> {
               }
             });
           });
-          createQuestionDialog(context,score,questinos.length);
+          createQuestionDialog(context,score,userAnswers.length);
 //          Fluttertoast.showToast(
 //            msg: "You Have Scored " + score.toString() + " of " + questinos.length.toString(),
 //            toastLength: Toast.LENGTH_SHORT,
 //            webBgColor: "#e74c3c",
 //            timeInSecForIosWeb: 1,
 //          );
-          if (score == questinos.length){
+          if (score == userAnswers.length){
             Top newTop = new Top(name: top.name, score: top == null ? 0 : top.score + 50);
             topService.updateTop(newTop);
           }
@@ -185,9 +190,28 @@ class _TestState extends State<Test> {
     return ll;
   }
 
+  Future<void> initDownloadsDirectoryState() async {
+    Directory downloadsDirectory;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      downloadsDirectory = await DownloadsPathProvider.downloadsDirectory;
+    } on PlatformException {
+      print('Could not get the downloads directory');
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _downloadsDirectory = downloadsDirectory;
+    });
+  }
+
   generatePdfAndView(context, String courseName) async {
     final pw.Document doc = pw.Document();
-
+    await Permission.storage.request();
     doc.addPage(pw.MultiPage(
         pageFormat:
         PdfPageFormat.letter.copyWith(marginBottom: 1.5 * PdfPageFormat.cm),
@@ -329,17 +353,13 @@ class _TestState extends State<Test> {
               text:
               'Text is available under the Creative Commons Attribution Share Alike License.')
         ]));
-      Directory appDocDirectory = await getApplicationDocumentsDirectory();
+      Directory appDocDirectory = await DownloadsPathProvider.downloadsDirectory;
       new Directory(appDocDirectory.path+'/'+'dir').create(recursive: true)
         .then((Directory directory) {
-      print('Path of New Dir: '+directory.path);
-      final File file = File(directory.path + '/' +  courseName + 'Certificate.pdf');
+      print('Path of New Dir: ' + appDocDirectory.path);
+      final File file = File(appDocDirectory.path + '/' +  courseName + 'Certificate.pdf');
       file.writeAsBytesSync(doc.save());
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => PdfViewerPage(path: directory.path + '/' +  courseName + 'Certificate.pdf'),
-        ),
-      );
+      Navigator.push(context, MaterialPageRoute(builder: (context) => PdfViewerPage(path: file.path )));
     });
   }
 }

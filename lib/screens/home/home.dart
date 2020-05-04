@@ -113,6 +113,7 @@ class _HomePageState extends State<Home> {
         ),
         drawer: MainDrawer(),
         body: Scaffold(
+          backgroundColor: Colors.cyan,
           body: CustomScrollView(
             slivers: <Widget>[
               ///First sliver is the App Bar
