@@ -64,7 +64,7 @@ class _MainDrawerState extends State<MainDrawer>{
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                                image: currentUser.photoURL == "" ? AssetImage('profile.png') : NetworkImage(currentUser.photoURL),
+                                image: currentUser.photoURL == "" ? AssetImage('assets/profile.png') : NetworkImage(currentUser.photoURL),
                                 fit: BoxFit.fill),
                           ),
                         ),

@@ -11,7 +11,7 @@ class MyCourse {
     return map;
   }
   factory MyCourse.fromJson(List<dynamic> parsedJson){
-    List<Course> _myCourses = parsedJson.map((i) => Course.fromMap(i)).toList();
+    List<Course> _myCourses = parsedJson == null ? [] : parsedJson.map((i) => Course.fromMap(i)).toList();
     return new MyCourse(
       myCourses: _myCourses,
     );

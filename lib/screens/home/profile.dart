@@ -112,7 +112,7 @@ class _ProfileState extends State<Profile>{
                                         decoration: new BoxDecoration(
                                           shape: BoxShape.circle,
                                           image: new DecorationImage(
-                                            image: new NetworkImage(currUser.photoURL ?? ''),
+                                            image: currUser.photoURL == "" ? AssetImage('assets/profile.png') : NetworkImage(currUser.photoURL),
                                             fit: BoxFit.cover,
                                           ),
                                         )),

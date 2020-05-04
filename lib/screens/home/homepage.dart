@@ -183,57 +183,66 @@ class _HomePageState extends State<HomePage> {
       ),
       drawer: MainDrawer(),
       body: Scaffold(
-        body: CustomScrollView(
-          slivers: <Widget>[
-            ///First sliver is the App Bar
-            SliverAppBar(
-              ///Properties of app bar
-              backgroundColor: Colors.white,
-              floating: false,
-              pinned: true,
-              expandedHeight: 50.0,
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/a9Bmy0Z.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: CustomScrollView(
+            slivers: <Widget>[
+              ///First sliver is the App Bar
+              SliverAppBar(
+                ///Properties of app bar
+                backgroundColor: Colors.transparent,
+                floating: false,
+                pinned: true,
+                expandedHeight: 50.0,
 
-              ///Properties of the App Bar when it is expanded
-              flexibleSpace: FlexibleSpaceBar(
-                centerTitle: true,
-                title: currUser != null ? Text(
-                  "Welcome to OkuPlus " + currUser,
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,),
-                ) : Text("Welcome to OkuPlus"),
-                background: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: Colors.black26,
-                        width: 1.0,
+                ///Properties of the App Bar when it is expanded
+                flexibleSpace: FlexibleSpaceBar(
+                  centerTitle: true,
+                  title: currUser != null ? Text(
+                    "Welcome to OkuPlus " + currUser,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,),
+                  ) : Text("Welcome to OkuPlus"),
+                  background: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: Colors.black26,
+                          width: 1.0,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                ///no.of items in the horizontal axis
-                crossAxisCount: 3,
-              ),
-              ///Lazy building of list
-              delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                  /// To convert this infinite list to a list with "n" no of items,
-                  /// uncomment the following line:
-                  if (index >= filteredCourses.length) return null;
-                  return listItem(filteredCourses[index], context);
-                },
-                /// Set childCount to limit no.of items
-                childCount: filteredCourses.length,
-              ),
-            )
-          ],
+              SliverGrid(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  ///no.of items in the horizontal axis
+                  crossAxisCount: 3,
+                ),
+                ///Lazy building of list
+                delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                    /// To convert this infinite list to a list with "n" no of items,
+                    /// uncomment the following line:
+                    if (index >= filteredCourses.length) return null;
+                    return listItem(filteredCourses[index], context);
+                  },
+                  /// Set childCount to limit no.of items
+                  childCount: filteredCourses.length,
+                ),
+              )
+            ],
+          ),
         ),
+
       ),
     );
   }
@@ -241,7 +250,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget listItem(String course, context) => Container(
     height: 50.0,
-    color: Colors.white,
+    color: Colors.transparent,
     child: Center(
       child: Card(
         semanticContainer: true,

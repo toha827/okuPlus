@@ -28,7 +28,7 @@ class _PromoState extends State<Promo>{
   MyCoursesService _myCoursesService;
   TeacherService _teacherService;
   final DatabaseService _databaseService = DatabaseService();
-
+  bool isChecked = false;
   User currUser;
   String promo = '';
   String fullName = '';
@@ -48,56 +48,65 @@ class _PromoState extends State<Promo>{
         _myCoursesService = MyCoursesService(currUser.uid);
         subscribers = currUser.subscribers;
       });
-
-      _myCoursesService.courses.listen((event) {
-        setState(() {
-
-        });
-        list = event ?? [];
-        _databaseService.courses.listen((event1) {
-          event1.forEach((element1) {
-            bool isHave = false;
-            list.forEach((element2) {
-              if (element1.id == element2.id) {
-                isHave = true;
-              }
-            });
-            if ( !isHave ) {
-              setState(() {
-                courses.add(element1);
-              });
-            }
-          });
-          int count = 0;
-          subscribers.forEach((element) {
-            count++;
-            if (count == 2){
-              AddCourseFromPromo(courses[0], courses[0].teacherId);
-              setState(() {
-                subscribers.removeRange(0, count);
-                count = 0;
-                currUser.subscribers = subscribers;
-                createQuestionDialog(context,courses[0].name);
-                courses.removeAt(0);
-              });
-              StudentsList();
-            }
-          });
-        });
-      });
-
+      promoGet();
       StudentsList();
-
     });
     super.initState();
   }
 
-  void StudentsList() {
-    studentsCountStream(currUser.subscribers).listen((event) {
+  Future<void> promoGet() async {
+    _myCoursesService.courses.listen((event) {
       setState(() {
-        users = event;
+        list = event ?? [];
+      });
+      _databaseService.courses.listen((event1) {
+        event1.forEach((element1) {
+          bool isHave = false;
+          list.forEach((element2) {
+            if (element1.id == element2.id) {
+              isHave = true;
+            }
+          });
+          if (!isHave) {
+            setState(() {
+              courses.add(element1);
+            });
+          }
+        });
+        for (int i = 0; i < subscribers.length / 2; i++) {
+          if (courses.length > 0) {
+            Course temp = courses[0];
+            setState(() {
+              courses.removeAt(0);
+              subscribers.removeRange(0, 2);
+            });
+            AddCourseFromPromo(temp, temp.teacherId);
+          }
+          setState(() {
+            currUser.subscribers = subscribers;
+            if (courses.length == 0) {
+              createQuestionDialog(context, "You have already get course");
+            } else {
+              createQuestionDialog(context, courses[0].name);
+            }
+          });
+        }
       });
     });
+  }
+
+  void StudentsList() {
+    if(currUser.subscribers.length == 0){
+      setState(() {
+        users = [];
+      });
+    } else {
+      studentsCountStream(currUser.subscribers).listen((event) {
+        setState(() {
+          users = event;
+        });
+      });
+    }
   }
 
   Future createQuestionDialog(BuildContext context, String courseName){
@@ -121,14 +130,19 @@ class _PromoState extends State<Promo>{
     });
   }
 
+  bool contains(Course element, List<Course> list) {
+    for (Course e in list) {
+      if (e.id == element.id) return true;
+    }
+    return false;
+  }
 
   AddCourseFromPromo(Course course, String teacherUid) {
     currUser.schedule.add(new Schedule(name: course.name, desc: "Lesson", complete: false, complete_date: course.course_date));
     _authService.updateUserrData(currUser.uid, currUser);
-    list.add(course);
     Teacher _teacher;
     _teacherService = TeacherService(uid: teacherUid);
-    _teacherService.getTeacher().listen((event) {
+    _teacherService.getTeacher().listen((event) async {
       setState(() {
         _teacher = event;
         _teacher.teacherCourses.forEach((element) {
@@ -137,10 +151,13 @@ class _PromoState extends State<Promo>{
             element.timestamp.add(DateTime.now());
             element.confirmed.add(false);
           }
+          if (!contains(course,list)) {
+            list.add(course);
+          }
         });
       });
       _teacherService.updateTeacher(_teacher);
-      _myCoursesService.updateUserData(MyCourse(myCourses: list));
+      await _myCoursesService.updateUserData(MyCourse(myCourses: list));
     });
 
   }
