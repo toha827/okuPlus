@@ -77,47 +77,43 @@ class _AddCourseState extends State<AddCourse> {
     return showDialog(context: context, builder: (context) {
       return AlertDialog(
         title: Text("Enter the Question"),
-        content: ListView(
+        content:  Column(
           children: <Widget>[
-            Column(
-              children: <Widget>[
-                ListTile(
-                  leading: Icon(Icons.description),
-                  title: TextField(
-                    controller: descriptionTextController,
-                  ),
-                  subtitle: Text("Description"),
-                ),
+            ListTile(
+              leading: Icon(Icons.description),
+              title: TextField(
+                controller: descriptionTextController,
+              ),
+              subtitle: Text("Description"),
+            ),
 
-                ListTile(
-                    leading: Icon(Icons.question_answer),
-                    title: TextField(
-                      controller: variantTextController,
-                    ),
-                    subtitle: Text("Variant"),
-                    trailing: ButtonTheme(
-                        minWidth: 50.0,
-                        height: 20.0,
-                        child: RaisedButton(
-                            child: Icon(Icons.add),
-                            onPressed: () {
-                              if(variantTextController.text.trim() != ""){
-                                setState(() {
-                                  variants.add(variantTextController.text.trim().toString());
-                                  variantTextController.text = "";
-                                });
-                              }
-                            })
-                    )
+            ListTile(
+                leading: Icon(Icons.question_answer),
+                title: TextField(
+                  controller: variantTextController,
                 ),
-                ListTile(
-                  leading: Icon(Icons.call_missed_outgoing),
-                  title: TextField(
-                    controller: answerTextController,
-                  ),
-                  subtitle: Text("Answer"),
-                ),
-              ],
+                subtitle: Text("Variant"),
+                trailing: ButtonTheme(
+                    minWidth: 50.0,
+                    height: 20.0,
+                    child: RaisedButton(
+                        child: Icon(Icons.add),
+                        onPressed: () {
+                          if(variantTextController.text.trim() != ""){
+                            setState(() {
+                              variants.add(variantTextController.text.trim().toString());
+                              variantTextController.text = "";
+                            });
+                          }
+                        })
+                )
+            ),
+            ListTile(
+              leading: Icon(Icons.call_missed_outgoing),
+              title: TextField(
+                controller: answerTextController,
+              ),
+              subtitle: Text("Answer"),
             ),
           ],
         ),
