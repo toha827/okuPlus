@@ -8,7 +8,7 @@ import 'package:flutterapp/models/top.dart';
 import 'package:flutterapp/models/user.dart';
 import 'package:flutterapp/screens/home/main_drawer.dart';
 import 'package:flutterapp/screens/home/statistics/requests_list.dart';
-import 'file:///C:/okuPlus-master/okuPlus-master/lib/screens/home/statistics/students_list.dart';
+import 'package:flutterapp/screens/home/statistics/students_list.dart';
 import 'package:flutterapp/services/auth.dart';
 import 'package:flutterapp/services/teacher_service.dart';
 import 'package:flutterapp/services/users.dart';

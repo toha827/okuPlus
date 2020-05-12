@@ -304,7 +304,7 @@ class _AddCourseState extends State<AddCourse> {
                             style: TextStyle(color: Colors.white),
                           ),
                           onPressed: () async {
-                            if (_formKey.currentState.validate()) {
+                            if (_formKey.currentState.validate() && FileUrl != null) {
                               setState(() => loading = true);
                               if( photoUrl != "" && courseDate != null) {
 

@@ -92,6 +92,27 @@ class _TestState extends State<Test> {
     });
   }
 
+  Future<Question> createFinishDialog(BuildContext context, String score){
+    return showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text("You have get certificate in " + score.toString()),
+        content: Column(
+            children: <Widget>[
+            ]
+        ),
+        actions: <Widget>[
+          MaterialButton(
+            elevation: 3.0,
+            child: Text("Ok"),
+            onPressed: (){
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -358,16 +379,16 @@ class _TestState extends State<Test> {
                 text:
                 'Text is available under the Creative Commons Attribution Share Alike License.')
           ]));
-      Directory appDocDirectory = await DownloadsPathProvider
-          .downloadsDirectory;
+      Directory appDocDirectory = await getExternalStorageDirectory();
       new Directory(appDocDirectory.path + '/' + 'dir').create(recursive: true)
           .then((Directory directory) {
         print('Path of New Dir: ' + appDocDirectory.path);
         final File file = File(
             appDocDirectory.path + '/' + courseName + 'Certificate.pdf');
         file.writeAsBytesSync(doc.save());
-        Navigator.push(context, MaterialPageRoute(
-            builder: (context) => PdfViewerPage(path: file.path)));
+        createFinishDialog(context, file.path.toString());
+        // Navigator.push(context, MaterialPageRoute(
+      //      builder: (context) => PdfViewerPage(path: file.path)));
       });
     }
   }

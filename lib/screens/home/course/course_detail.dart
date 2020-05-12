@@ -25,6 +25,7 @@ import 'package:flutterapp/shared/common.dart';
 import 'package:flutterapp/shared/loading.dart';
 import 'package:flutterapp/shared/textStyle.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../main.dart';
 
@@ -219,12 +220,17 @@ class _CourseDetailState extends State<CourseDetail> {
                     child: Icon(Icons.arrow_downward),
                     onPressed: () async {
                       //_downloadFile(course.fileUrl, course.name);
-                      final taskId = await FlutterDownloader.enqueue(
-                        url: course.fileUrl,
-                        savedDir: (await getApplicationDocumentsDirectory()).path,
-                        showNotification: true, // show download progress in status bar (for Android)
-                        openFileFromNotification: true, // click on notification to open downloaded file (for Android)
-                      );
+                      if (await Permission.storage.request().isGranted) {
+                        final taskId = await FlutterDownloader.enqueue(
+                          url: course.fileUrl,
+                          fileName: course.name,
+                          savedDir: (await getExternalStorageDirectory())
+                              .path,
+                          showNotification: true,
+                          // show download progress in status bar (for Android)
+                          openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+                        );
+                      }
                     },
                   ),
                 ),
