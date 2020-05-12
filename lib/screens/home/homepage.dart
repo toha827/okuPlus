@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue[50],
+      backgroundColor: Colors.cyan,
       appBar: AppBar(
         title: isSearching ? Text('OkuPlus') : TextField(
           onChanged: (value) {
@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
                 hintText: "Search Country Here",
                 hintStyle: TextStyle(color: Colors.white)),
         ),
-        backgroundColor: Colors.blue[400],
+        backgroundColor: Colors.cyan,
         elevation: 0.0,
         actions: <Widget>[
           isSearching

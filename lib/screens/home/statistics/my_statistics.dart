@@ -364,6 +364,7 @@ class _MyStatisticsState extends State<MyStatistics> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.cyan,
         title: Text(""),
         actions: <Widget>[
           IconButton(icon: Icon(

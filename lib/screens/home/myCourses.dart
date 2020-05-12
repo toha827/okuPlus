@@ -28,7 +28,7 @@ class MyCoursesView extends StatelessWidget {
               backgroundColor: Colors.blue[50],
               appBar: AppBar(
                 title: Text('OkuPlus'),
-                backgroundColor: Colors.blue[400],
+                backgroundColor: Colors.cyan,
                 elevation: 0.0,
                 actions: <Widget>[
                   FlatButton.icon(

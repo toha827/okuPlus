@@ -17,7 +17,7 @@ class _MyWidgetState extends State<MySchedule> {
   final TextEditingController _filter = TextEditingController();
   String _searchText = "";
   Icon _searchIcon = Icon(Icons.search);
-  Widget _appBarTitle = Text( 'Task Manager' );
+  Widget _appBarTitle = Text( 'Schedule' );
   final TaskList taskList = TaskList();
 
   _MyWidgetState(){
@@ -61,7 +61,7 @@ class _MyWidgetState extends State<MySchedule> {
     return Scaffold(
         appBar: AppBar(
           title: _appBarTitle,
-          backgroundColor: globals.mainColor,
+          backgroundColor: Colors.cyan,
           actions: <Widget>[
             IconButton(
                 icon: _searchIcon,
@@ -96,10 +96,11 @@ class MyFAB extends StatelessWidget{
     return FloatingActionButton(
       // When the user presses the button, show an alert dialog with the
       // text the user has typed into our text field.
+
       onPressed: () {
         taskList.addNew(task,true);
       },
-      backgroundColor: globals.mainColor,
+      backgroundColor: Colors.cyan  ,
       tooltip: 'Show me the value!',
       child: Icon(
           Icons.add

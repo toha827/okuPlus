@@ -178,7 +178,7 @@ class _PromoState extends State<Promo>{
     return Scaffold(
       appBar: AppBar(
         title: Text('OkuPlus'),
-        backgroundColor: Colors.blue[400],
+        backgroundColor: Colors.cyan,
         elevation: 0.0,
         actions: <Widget>[
         ],

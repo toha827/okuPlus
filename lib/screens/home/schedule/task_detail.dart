@@ -101,6 +101,7 @@ class _TaskDetailState extends State<TaskDetail>{
     return WillPopScope(
         onWillPop: onPop,
         child: Scaffold(
+        backgroundColor: Colors.cyan,
         appBar: AppBar(
           title: Text(
             "Task Manager",

@@ -50,7 +50,7 @@ class _MainDrawerState extends State<MainDrawer>{
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(5),
-                  color: Theme.of(context).primaryColor,
+                  color: Colors.cyan,
                   child: Center(
                     child: Column(
                       children: <Widget>[

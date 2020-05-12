@@ -34,7 +34,7 @@ class _SettingsState extends State<Settings> {
           return Scaffold(
             appBar: AppBar(
               title: Text('OkuPlus'),
-              backgroundColor: Colors.blue[400],
+              backgroundColor: Colors.cyan,
               elevation: 0.0,
               actions: <Widget>[
               ],

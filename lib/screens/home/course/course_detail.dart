@@ -105,7 +105,7 @@ class _CourseDetailState extends State<CourseDetail> {
     return isLoading ? new Loading() : new Scaffold(
               body: new Container(
             constraints: new BoxConstraints.expand(),
-            color: new Color(0xFF736AB7),
+            color: new Color(0xFF37474F),
             child: new Stack (
               children: <Widget>[
                 _getBackground(),
@@ -139,7 +139,7 @@ class _CourseDetailState extends State<CourseDetail> {
             gradient: new LinearGradient(
               colors: <Color>[
                 new Color(0x00736AB7),
-                new Color(0xFF736AB7)
+                new Color(0xFF37474F)
               ],
               stops: [0.0, 0.9],
               begin: const FractionalOffset(0.0, 0.0),

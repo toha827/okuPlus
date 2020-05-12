@@ -88,7 +88,7 @@ class _HomePageState extends State<Home> {
                 hintText: "Search Country Here",
                 hintStyle: TextStyle(color: Colors.white)),
           ),
-          backgroundColor: Colors.blue[400],
+          backgroundColor: Colors.cyan,
           elevation: 0.0,
           actions: <Widget>[
             isSearching

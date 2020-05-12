@@ -183,7 +183,7 @@ class _TaskBlock extends StatelessWidget{
             width: 60,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: globals.mainColor,
+              color: Colors.blueGrey[900],
             ),
           ),
           SizedBox(width: 15),

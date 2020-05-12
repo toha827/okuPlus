@@ -30,7 +30,7 @@ class MyTeachingCourses extends StatelessWidget {
                 backgroundColor: Colors.blue[50],
                 appBar: AppBar(
                   title: Text('OkuPlus'),
-                  backgroundColor: Colors.blue[400],
+                  backgroundColor: Colors.cyan,
                   elevation: 0.0,
                   actions: <Widget>[
                   ],
@@ -99,7 +99,7 @@ class MyTeachingCourses extends StatelessWidget {
                             Navigator.push(context, MaterialPageRoute(builder: (context) => AddCourse()));
                           },
                           child: Icon(Icons.add, color: Colors.white,),
-                          foregroundColor: Colors.blue,
+                          foregroundColor: Colors.cyan,
                         ),
                       );
                     }),
